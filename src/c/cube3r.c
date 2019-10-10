@@ -1,5 +1,3 @@
-const int ALL_ROTATION_LEN = 24;
-
 cube R_1(cube *other) { 
     cube result = *other;
     result.edges[1] = other->edges[5];
@@ -450,83 +448,331 @@ cube B_3(cube *other) {
     return result;
 }
 
-cube r_1(cube *other) { 
-    cube result = *other;
-    result.edges[0] = other->edges[4];
-    result.edges[2] = other->edges[6];
-    result.edges[4] = other->edges[8];
-    result.edges[6] = other->edges[10];
-    result.edges[8] = other->edges[18];
-    result.edges[10] = other->edges[16];
-    result.edges[16] = other->edges[2];
-    result.edges[18] = other->edges[0];
+cube x(cube *other) { 
+    cube result;
+    int color_swap[6] = { 4, 0, 1, 3, 2, 5 };
+    result.edges[0] = color_swap[other->edges[4]];
+    result.edges[1] = color_swap[other->edges[5]];
+    result.edges[2] = color_swap[other->edges[6]];
+    result.edges[3] = color_swap[other->edges[7]];
+    result.edges[4] = color_swap[other->edges[8]];
+    result.edges[5] = color_swap[other->edges[9]];
+    result.edges[6] = color_swap[other->edges[10]];
+    result.edges[7] = color_swap[other->edges[11]];
+    result.edges[8] = color_swap[other->edges[18]];
+    result.edges[9] = color_swap[other->edges[19]];
+    result.edges[10] = color_swap[other->edges[16]];
+    result.edges[11] = color_swap[other->edges[17]];
+    result.edges[12] = color_swap[other->edges[15]];
+    result.edges[13] = color_swap[other->edges[12]];
+    result.edges[14] = color_swap[other->edges[13]];
+    result.edges[15] = color_swap[other->edges[14]];
+    result.edges[16] = color_swap[other->edges[2]];
+    result.edges[17] = color_swap[other->edges[3]];
+    result.edges[18] = color_swap[other->edges[0]];
+    result.edges[19] = color_swap[other->edges[1]];
+    result.edges[20] = color_swap[other->edges[21]];
+    result.edges[21] = color_swap[other->edges[22]];
+    result.edges[22] = color_swap[other->edges[23]];
+    result.edges[23] = color_swap[other->edges[20]];
+    result.corners[0] = color_swap[other->corners[4]];
+    result.corners[1] = color_swap[other->corners[5]];
+    result.corners[2] = color_swap[other->corners[6]];
+    result.corners[3] = color_swap[other->corners[7]];
+    result.corners[4] = color_swap[other->corners[8]];
+    result.corners[5] = color_swap[other->corners[9]];
+    result.corners[6] = color_swap[other->corners[10]];
+    result.corners[7] = color_swap[other->corners[11]];
+    result.corners[8] = color_swap[other->corners[19]];
+    result.corners[9] = color_swap[other->corners[18]];
+    result.corners[10] = color_swap[other->corners[17]];
+    result.corners[11] = color_swap[other->corners[16]];
+    result.corners[12] = color_swap[other->corners[14]];
+    result.corners[13] = color_swap[other->corners[12]];
+    result.corners[14] = color_swap[other->corners[15]];
+    result.corners[15] = color_swap[other->corners[13]];
+    result.corners[16] = color_swap[other->corners[3]];
+    result.corners[17] = color_swap[other->corners[2]];
+    result.corners[18] = color_swap[other->corners[1]];
+    result.corners[19] = color_swap[other->corners[0]];
+    result.corners[20] = color_swap[other->corners[21]];
+    result.corners[21] = color_swap[other->corners[23]];
+    result.corners[22] = color_swap[other->corners[20]];
+    result.corners[23] = color_swap[other->corners[22]];
     return result;
 }
 
-cube r_2(cube *other) { 
-    cube result = *other;
-    result.edges[0] = other->edges[8];
-    result.edges[2] = other->edges[10];
-    result.edges[4] = other->edges[18];
-    result.edges[6] = other->edges[16];
-    result.edges[8] = other->edges[0];
-    result.edges[10] = other->edges[2];
-    result.edges[16] = other->edges[6];
-    result.edges[18] = other->edges[4];
+cube xx(cube *other) { 
+    cube result;
+    int color_swap[6] = { 2, 4, 0, 3, 1, 5 };
+    result.edges[0] = color_swap[other->edges[8]];
+    result.edges[1] = color_swap[other->edges[9]];
+    result.edges[2] = color_swap[other->edges[10]];
+    result.edges[3] = color_swap[other->edges[11]];
+    result.edges[4] = color_swap[other->edges[18]];
+    result.edges[5] = color_swap[other->edges[19]];
+    result.edges[6] = color_swap[other->edges[16]];
+    result.edges[7] = color_swap[other->edges[17]];
+    result.edges[8] = color_swap[other->edges[0]];
+    result.edges[9] = color_swap[other->edges[1]];
+    result.edges[10] = color_swap[other->edges[2]];
+    result.edges[11] = color_swap[other->edges[3]];
+    result.edges[12] = color_swap[other->edges[14]];
+    result.edges[13] = color_swap[other->edges[15]];
+    result.edges[14] = color_swap[other->edges[12]];
+    result.edges[15] = color_swap[other->edges[13]];
+    result.edges[16] = color_swap[other->edges[6]];
+    result.edges[17] = color_swap[other->edges[7]];
+    result.edges[18] = color_swap[other->edges[4]];
+    result.edges[19] = color_swap[other->edges[5]];
+    result.edges[20] = color_swap[other->edges[22]];
+    result.edges[21] = color_swap[other->edges[23]];
+    result.edges[22] = color_swap[other->edges[20]];
+    result.edges[23] = color_swap[other->edges[21]];
+    result.corners[0] = color_swap[other->corners[8]];
+    result.corners[1] = color_swap[other->corners[9]];
+    result.corners[2] = color_swap[other->corners[10]];
+    result.corners[3] = color_swap[other->corners[11]];
+    result.corners[4] = color_swap[other->corners[19]];
+    result.corners[5] = color_swap[other->corners[18]];
+    result.corners[6] = color_swap[other->corners[17]];
+    result.corners[7] = color_swap[other->corners[16]];
+    result.corners[8] = color_swap[other->corners[0]];
+    result.corners[9] = color_swap[other->corners[1]];
+    result.corners[10] = color_swap[other->corners[2]];
+    result.corners[11] = color_swap[other->corners[3]];
+    result.corners[12] = color_swap[other->corners[15]];
+    result.corners[13] = color_swap[other->corners[14]];
+    result.corners[14] = color_swap[other->corners[13]];
+    result.corners[15] = color_swap[other->corners[12]];
+    result.corners[16] = color_swap[other->corners[7]];
+    result.corners[17] = color_swap[other->corners[6]];
+    result.corners[18] = color_swap[other->corners[5]];
+    result.corners[19] = color_swap[other->corners[4]];
+    result.corners[20] = color_swap[other->corners[23]];
+    result.corners[21] = color_swap[other->corners[22]];
+    result.corners[22] = color_swap[other->corners[21]];
+    result.corners[23] = color_swap[other->corners[20]];
     return result;
 }
 
-cube r_3(cube *other) { 
-    cube result = *other;
-    result.edges[0] = other->edges[18];
-    result.edges[2] = other->edges[16];
-    result.edges[4] = other->edges[0];
-    result.edges[6] = other->edges[2];
-    result.edges[8] = other->edges[4];
-    result.edges[10] = other->edges[6];
-    result.edges[16] = other->edges[10];
-    result.edges[18] = other->edges[8];
+cube xxx(cube *other) { 
+    cube result;
+    int color_swap[6] = { 1, 2, 4, 3, 0, 5 };
+    result.edges[0] = color_swap[other->edges[18]];
+    result.edges[1] = color_swap[other->edges[19]];
+    result.edges[2] = color_swap[other->edges[16]];
+    result.edges[3] = color_swap[other->edges[17]];
+    result.edges[4] = color_swap[other->edges[0]];
+    result.edges[5] = color_swap[other->edges[1]];
+    result.edges[6] = color_swap[other->edges[2]];
+    result.edges[7] = color_swap[other->edges[3]];
+    result.edges[8] = color_swap[other->edges[4]];
+    result.edges[9] = color_swap[other->edges[5]];
+    result.edges[10] = color_swap[other->edges[6]];
+    result.edges[11] = color_swap[other->edges[7]];
+    result.edges[12] = color_swap[other->edges[13]];
+    result.edges[13] = color_swap[other->edges[14]];
+    result.edges[14] = color_swap[other->edges[15]];
+    result.edges[15] = color_swap[other->edges[12]];
+    result.edges[16] = color_swap[other->edges[10]];
+    result.edges[17] = color_swap[other->edges[11]];
+    result.edges[18] = color_swap[other->edges[8]];
+    result.edges[19] = color_swap[other->edges[9]];
+    result.edges[20] = color_swap[other->edges[23]];
+    result.edges[21] = color_swap[other->edges[20]];
+    result.edges[22] = color_swap[other->edges[21]];
+    result.edges[23] = color_swap[other->edges[22]];
+    result.corners[0] = color_swap[other->corners[19]];
+    result.corners[1] = color_swap[other->corners[18]];
+    result.corners[2] = color_swap[other->corners[17]];
+    result.corners[3] = color_swap[other->corners[16]];
+    result.corners[4] = color_swap[other->corners[0]];
+    result.corners[5] = color_swap[other->corners[1]];
+    result.corners[6] = color_swap[other->corners[2]];
+    result.corners[7] = color_swap[other->corners[3]];
+    result.corners[8] = color_swap[other->corners[4]];
+    result.corners[9] = color_swap[other->corners[5]];
+    result.corners[10] = color_swap[other->corners[6]];
+    result.corners[11] = color_swap[other->corners[7]];
+    result.corners[12] = color_swap[other->corners[13]];
+    result.corners[13] = color_swap[other->corners[15]];
+    result.corners[14] = color_swap[other->corners[12]];
+    result.corners[15] = color_swap[other->corners[14]];
+    result.corners[16] = color_swap[other->corners[11]];
+    result.corners[17] = color_swap[other->corners[10]];
+    result.corners[18] = color_swap[other->corners[9]];
+    result.corners[19] = color_swap[other->corners[8]];
+    result.corners[20] = color_swap[other->corners[22]];
+    result.corners[21] = color_swap[other->corners[20]];
+    result.corners[22] = color_swap[other->corners[23]];
+    result.corners[23] = color_swap[other->corners[21]];
     return result;
 }
 
-cube u_1(cube *other) { 
-    cube result = *other;
-    result.edges[1] = other->edges[14];
-    result.edges[3] = other->edges[12];
-    result.edges[9] = other->edges[22];
-    result.edges[11] = other->edges[20];
-    result.edges[12] = other->edges[9];
-    result.edges[14] = other->edges[11];
-    result.edges[20] = other->edges[1];
-    result.edges[22] = other->edges[3];
+cube y(cube *other) { 
+    cube result;
+    int color_swap[6] = { 0, 5, 2, 1, 3, 4 };
+    result.edges[0] = color_swap[other->edges[3]];
+    result.edges[1] = color_swap[other->edges[0]];
+    result.edges[2] = color_swap[other->edges[1]];
+    result.edges[3] = color_swap[other->edges[2]];
+    result.edges[4] = color_swap[other->edges[12]];
+    result.edges[5] = color_swap[other->edges[13]];
+    result.edges[6] = color_swap[other->edges[14]];
+    result.edges[7] = color_swap[other->edges[15]];
+    result.edges[8] = color_swap[other->edges[9]];
+    result.edges[9] = color_swap[other->edges[10]];
+    result.edges[10] = color_swap[other->edges[11]];
+    result.edges[11] = color_swap[other->edges[8]];
+    result.edges[12] = color_swap[other->edges[16]];
+    result.edges[13] = color_swap[other->edges[17]];
+    result.edges[14] = color_swap[other->edges[18]];
+    result.edges[15] = color_swap[other->edges[19]];
+    result.edges[16] = color_swap[other->edges[20]];
+    result.edges[17] = color_swap[other->edges[21]];
+    result.edges[18] = color_swap[other->edges[22]];
+    result.edges[19] = color_swap[other->edges[23]];
+    result.edges[20] = color_swap[other->edges[4]];
+    result.edges[21] = color_swap[other->edges[5]];
+    result.edges[22] = color_swap[other->edges[6]];
+    result.edges[23] = color_swap[other->edges[7]];
+    result.corners[0] = color_swap[other->corners[2]];
+    result.corners[1] = color_swap[other->corners[0]];
+    result.corners[2] = color_swap[other->corners[3]];
+    result.corners[3] = color_swap[other->corners[1]];
+    result.corners[4] = color_swap[other->corners[12]];
+    result.corners[5] = color_swap[other->corners[13]];
+    result.corners[6] = color_swap[other->corners[14]];
+    result.corners[7] = color_swap[other->corners[15]];
+    result.corners[8] = color_swap[other->corners[9]];
+    result.corners[9] = color_swap[other->corners[11]];
+    result.corners[10] = color_swap[other->corners[8]];
+    result.corners[11] = color_swap[other->corners[10]];
+    result.corners[12] = color_swap[other->corners[16]];
+    result.corners[13] = color_swap[other->corners[17]];
+    result.corners[14] = color_swap[other->corners[18]];
+    result.corners[15] = color_swap[other->corners[19]];
+    result.corners[16] = color_swap[other->corners[20]];
+    result.corners[17] = color_swap[other->corners[21]];
+    result.corners[18] = color_swap[other->corners[22]];
+    result.corners[19] = color_swap[other->corners[23]];
+    result.corners[20] = color_swap[other->corners[4]];
+    result.corners[21] = color_swap[other->corners[5]];
+    result.corners[22] = color_swap[other->corners[6]];
+    result.corners[23] = color_swap[other->corners[7]];
     return result;
 }
 
-cube u_2(cube *other) { 
-    cube result = *other;
-    result.edges[1] = other->edges[11];
-    result.edges[3] = other->edges[9];
-    result.edges[9] = other->edges[3];
-    result.edges[11] = other->edges[1];
-    result.edges[12] = other->edges[22];
-    result.edges[14] = other->edges[20];
-    result.edges[20] = other->edges[14];
-    result.edges[22] = other->edges[12];
+cube z(cube *other) { 
+    cube result;
+    int color_swap[6] = { 3, 1, 5, 2, 4, 0 };
+    result.edges[0] = color_swap[other->edges[23]];
+    result.edges[1] = color_swap[other->edges[20]];
+    result.edges[2] = color_swap[other->edges[21]];
+    result.edges[3] = color_swap[other->edges[22]];
+    result.edges[4] = color_swap[other->edges[7]];
+    result.edges[5] = color_swap[other->edges[4]];
+    result.edges[6] = color_swap[other->edges[5]];
+    result.edges[7] = color_swap[other->edges[6]];
+    result.edges[8] = color_swap[other->edges[15]];
+    result.edges[9] = color_swap[other->edges[12]];
+    result.edges[10] = color_swap[other->edges[13]];
+    result.edges[11] = color_swap[other->edges[14]];
+    result.edges[12] = color_swap[other->edges[3]];
+    result.edges[13] = color_swap[other->edges[0]];
+    result.edges[14] = color_swap[other->edges[1]];
+    result.edges[15] = color_swap[other->edges[2]];
+    result.edges[16] = color_swap[other->edges[17]];
+    result.edges[17] = color_swap[other->edges[18]];
+    result.edges[18] = color_swap[other->edges[19]];
+    result.edges[19] = color_swap[other->edges[16]];
+    result.edges[20] = color_swap[other->edges[11]];
+    result.edges[21] = color_swap[other->edges[8]];
+    result.edges[22] = color_swap[other->edges[9]];
+    result.edges[23] = color_swap[other->edges[10]];
+    result.corners[0] = color_swap[other->corners[22]];
+    result.corners[1] = color_swap[other->corners[20]];
+    result.corners[2] = color_swap[other->corners[23]];
+    result.corners[3] = color_swap[other->corners[21]];
+    result.corners[4] = color_swap[other->corners[6]];
+    result.corners[5] = color_swap[other->corners[4]];
+    result.corners[6] = color_swap[other->corners[7]];
+    result.corners[7] = color_swap[other->corners[5]];
+    result.corners[8] = color_swap[other->corners[14]];
+    result.corners[9] = color_swap[other->corners[12]];
+    result.corners[10] = color_swap[other->corners[15]];
+    result.corners[11] = color_swap[other->corners[13]];
+    result.corners[12] = color_swap[other->corners[2]];
+    result.corners[13] = color_swap[other->corners[0]];
+    result.corners[14] = color_swap[other->corners[3]];
+    result.corners[15] = color_swap[other->corners[1]];
+    result.corners[16] = color_swap[other->corners[17]];
+    result.corners[17] = color_swap[other->corners[19]];
+    result.corners[18] = color_swap[other->corners[16]];
+    result.corners[19] = color_swap[other->corners[18]];
+    result.corners[20] = color_swap[other->corners[10]];
+    result.corners[21] = color_swap[other->corners[8]];
+    result.corners[22] = color_swap[other->corners[11]];
+    result.corners[23] = color_swap[other->corners[9]];
     return result;
 }
 
-cube u_3(cube *other) { 
-    cube result = *other;
-    result.edges[1] = other->edges[20];
-    result.edges[3] = other->edges[22];
-    result.edges[9] = other->edges[12];
-    result.edges[11] = other->edges[14];
-    result.edges[12] = other->edges[3];
-    result.edges[14] = other->edges[1];
-    result.edges[20] = other->edges[11];
-    result.edges[22] = other->edges[9];
+cube zz(cube *other) { 
+    cube result;
+    int color_swap[6] = { 3, 1, 5, 2, 4, 0 };
+    result.edges[0] = color_swap[other->edges[23]];
+    result.edges[1] = color_swap[other->edges[20]];
+    result.edges[2] = color_swap[other->edges[21]];
+    result.edges[3] = color_swap[other->edges[22]];
+    result.edges[4] = color_swap[other->edges[7]];
+    result.edges[5] = color_swap[other->edges[4]];
+    result.edges[6] = color_swap[other->edges[5]];
+    result.edges[7] = color_swap[other->edges[6]];
+    result.edges[8] = color_swap[other->edges[15]];
+    result.edges[9] = color_swap[other->edges[12]];
+    result.edges[10] = color_swap[other->edges[13]];
+    result.edges[11] = color_swap[other->edges[14]];
+    result.edges[12] = color_swap[other->edges[3]];
+    result.edges[13] = color_swap[other->edges[0]];
+    result.edges[14] = color_swap[other->edges[1]];
+    result.edges[15] = color_swap[other->edges[2]];
+    result.edges[16] = color_swap[other->edges[17]];
+    result.edges[17] = color_swap[other->edges[18]];
+    result.edges[18] = color_swap[other->edges[19]];
+    result.edges[19] = color_swap[other->edges[16]];
+    result.edges[20] = color_swap[other->edges[11]];
+    result.edges[21] = color_swap[other->edges[8]];
+    result.edges[22] = color_swap[other->edges[9]];
+    result.edges[23] = color_swap[other->edges[10]];
+    result.corners[0] = color_swap[other->corners[22]];
+    result.corners[1] = color_swap[other->corners[20]];
+    result.corners[2] = color_swap[other->corners[23]];
+    result.corners[3] = color_swap[other->corners[21]];
+    result.corners[4] = color_swap[other->corners[6]];
+    result.corners[5] = color_swap[other->corners[4]];
+    result.corners[6] = color_swap[other->corners[7]];
+    result.corners[7] = color_swap[other->corners[5]];
+    result.corners[8] = color_swap[other->corners[14]];
+    result.corners[9] = color_swap[other->corners[12]];
+    result.corners[10] = color_swap[other->corners[15]];
+    result.corners[11] = color_swap[other->corners[13]];
+    result.corners[12] = color_swap[other->corners[2]];
+    result.corners[13] = color_swap[other->corners[0]];
+    result.corners[14] = color_swap[other->corners[3]];
+    result.corners[15] = color_swap[other->corners[1]];
+    result.corners[16] = color_swap[other->corners[17]];
+    result.corners[17] = color_swap[other->corners[19]];
+    result.corners[18] = color_swap[other->corners[16]];
+    result.corners[19] = color_swap[other->corners[18]];
+    result.corners[20] = color_swap[other->corners[10]];
+    result.corners[21] = color_swap[other->corners[8]];
+    result.corners[22] = color_swap[other->corners[11]];
+    result.corners[23] = color_swap[other->corners[9]];
     return result;
 }
+
+const int ALL_ROTATION_LEN = 24;
 
 t_rotation all_rotations[] = {
 R_1,
@@ -547,12 +793,12 @@ D_3,
 B_1,
 B_2,
 B_3,
-r_1,
-r_2,
-r_3,
-u_1,
-u_2,
-u_3
+x,
+xx,
+xxx,
+y,
+z,
+zz
 };
 char* all_rotations_s[] = {
 "R",
@@ -573,10 +819,10 @@ char* all_rotations_s[] = {
 "B",
 "B2",
 "B'",
-"r",
-"r2",
-"r'",
-"u",
-"u2",
-"u'"
+"x",
+"xx",
+"xxx",
+"y",
+"z",
+"zz"
 };
