@@ -1,63 +1,66 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include "cube3.c"
 #include "cube3r.c"
 
+void sort_cubes(cube* arr, int from, int to) {
+    qsort(arr + from, to - from, sizeof(cube), cube_compare);
+    // for (int i=from; i<to - 1; i++) {
+    //     printf("compare after sort: %d\n", cube_compare(arr + i, arr + i + 1) );
+    // }
+}
 
+// Returns the number of lat unique element
+int remove_duplicates(cube* arr, int from, int to) {
+    int last_unique = from;
+    for (int i = from + 1; i<to; i++ ) {
+        if (cube_compare(arr + last_unique, arr + i) != 0) {
+            arr[++last_unique] = arr[i];
+        }
+    }
+    return last_unique + 1;
+}
 
 int main() {
-    cube x = empty_cube();
+    cube* cache;
+    int milion = 1000 * 1000;
+    cache = malloc(100 * milion * sizeof(cube));
 
-    cube r1 = R_1(&x);
-    cube r2 = R_2(&x);
-    cube r3 = R_3(&x);
+    cache[0] = empty_cube();
+    int level_start = 0;
+    int level_end = 1;
 
-    cube f1 = F_1(&x);
-    cube f2 = F_2(&x);
-    cube f3 = F_3(&x);
+    int new_level_end = 1;
 
-    cube u1 = U_1(&x);
-    cube u2 = U_2(&x);
-    cube u3 = U_3(&x);
+    for (int l=1; l<=4; l++) {
 
+        for (int i=0; i<ALL_ROTATION_LEN; i++)
+            for (int c = level_start; c < level_end; c++) {
+                cache[new_level_end] = all_rotations[i](cache + c);
+                new_level_end++;
+            }
+        level_start = level_end;
+        sort_cubes(cache, level_start, new_level_end);
 
-    cube color =x;
-color = D_1(&color);
-    color = F_1(&color);
-    color = R_2(&color);
-    color = D_3(&color);
-    color = R_2(&color);
-    color = D_3(&color);
-    color = L_2(&color);
-    color = D_2(&color);
-    color = U_1(&color);
-    color = L_2(&color);
-    color = B_2(&color);
-    color = F_2(&color);
-    color = U_2(&color);
-    color = D_2(&color);
-    color = L_3(&color);
-    color = U_1(&color);
-    color = B_1(&color);
-    color = L_2(&color);
-    color = B_3(&color);
-    color = F_3(&color);
-    color = R_3(&color);
-    color = U_3(&color);
-    color = R_1(&color);
-    color = F_1(&color);
-    color = D_1(&color);
-    color = L_1(&color);
-    color = B_1(&color);
-    color = U_1(&color);
-    color = R_3(&color);
-    color = F_3(&color);
-    color = D_3(&color);
-    color = L_3(&color);
-    color = B_3(&color);
-    color = U_3(&color);
+        printf("after %d new_level_end = %d. And it was reduced to ", l, (new_level_end - level_start));
+        level_end = remove_duplicates(cache, level_start, new_level_end);
+        printf("%d\n", level_end - level_start);
 
+        for (int c=level_start; c< level_end; c++) {
+            //printf("L%d ", l);
+            //pp3(cache+c);
+            //link(cache + c, "kuba");
+        }
 
-    link(&color, "color F3");
+        // printf("Level %d has %d items\n", l, level_end- level_start );
+    }
 
+    cube rr = empty_cube();
+    rr = R_1(&rr);
+    rr = R_1(&rr);
 
+    cube r2 = empty_cube();
+    r2 = R_2(&r2);
+
+    printf("compare = %d\n", cube_compare(&rr, &r2));
 }
