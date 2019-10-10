@@ -1,3 +1,5 @@
+const int ALL_ROTATION_LEN = 24;
+
 cube R_1(cube *other) { 
     cube result = *other;
     result.edges[1] = other->edges[5];
@@ -448,3 +450,133 @@ cube B_3(cube *other) {
     return result;
 }
 
+cube r_1(cube *other) { 
+    cube result = *other;
+    result.edges[0] = other->edges[4];
+    result.edges[2] = other->edges[6];
+    result.edges[4] = other->edges[8];
+    result.edges[6] = other->edges[10];
+    result.edges[8] = other->edges[18];
+    result.edges[10] = other->edges[16];
+    result.edges[16] = other->edges[2];
+    result.edges[18] = other->edges[0];
+    return result;
+}
+
+cube r_2(cube *other) { 
+    cube result = *other;
+    result.edges[0] = other->edges[8];
+    result.edges[2] = other->edges[10];
+    result.edges[4] = other->edges[18];
+    result.edges[6] = other->edges[16];
+    result.edges[8] = other->edges[0];
+    result.edges[10] = other->edges[2];
+    result.edges[16] = other->edges[6];
+    result.edges[18] = other->edges[4];
+    return result;
+}
+
+cube r_3(cube *other) { 
+    cube result = *other;
+    result.edges[0] = other->edges[18];
+    result.edges[2] = other->edges[16];
+    result.edges[4] = other->edges[0];
+    result.edges[6] = other->edges[2];
+    result.edges[8] = other->edges[4];
+    result.edges[10] = other->edges[6];
+    result.edges[16] = other->edges[10];
+    result.edges[18] = other->edges[8];
+    return result;
+}
+
+cube u_1(cube *other) { 
+    cube result = *other;
+    result.edges[1] = other->edges[14];
+    result.edges[3] = other->edges[12];
+    result.edges[9] = other->edges[22];
+    result.edges[11] = other->edges[20];
+    result.edges[12] = other->edges[9];
+    result.edges[14] = other->edges[11];
+    result.edges[20] = other->edges[1];
+    result.edges[22] = other->edges[3];
+    return result;
+}
+
+cube u_2(cube *other) { 
+    cube result = *other;
+    result.edges[1] = other->edges[11];
+    result.edges[3] = other->edges[9];
+    result.edges[9] = other->edges[3];
+    result.edges[11] = other->edges[1];
+    result.edges[12] = other->edges[22];
+    result.edges[14] = other->edges[20];
+    result.edges[20] = other->edges[14];
+    result.edges[22] = other->edges[12];
+    return result;
+}
+
+cube u_3(cube *other) { 
+    cube result = *other;
+    result.edges[1] = other->edges[20];
+    result.edges[3] = other->edges[22];
+    result.edges[9] = other->edges[12];
+    result.edges[11] = other->edges[14];
+    result.edges[12] = other->edges[3];
+    result.edges[14] = other->edges[1];
+    result.edges[20] = other->edges[11];
+    result.edges[22] = other->edges[9];
+    return result;
+}
+
+t_rotation all_rotations[] = {
+R_1,
+R_2,
+R_3,
+U_1,
+U_2,
+U_3,
+F_1,
+F_2,
+F_3,
+L_1,
+L_2,
+L_3,
+D_1,
+D_2,
+D_3,
+B_1,
+B_2,
+B_3,
+r_1,
+r_2,
+r_3,
+u_1,
+u_2,
+u_3
+};
+char* all_rotations_s[] = {
+"R",
+"R2",
+"R'",
+"U",
+"U2",
+"U'",
+"F",
+"F2",
+"F'",
+"L",
+"L2",
+"L'",
+"D",
+"D2",
+"D'",
+"B",
+"B2",
+"B'",
+"r",
+"r2",
+"r'",
+"u",
+"u2",
+"u'"
+};

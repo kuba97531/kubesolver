@@ -38,21 +38,47 @@ def writeRotationFuctions(f, name, edgeCycles, cornerCycles):
         f.write("\n")
         #print()
 
-faces = (
-    {"name" : "R", "e": [[12,13,14,15], [1,19,9,5]], "c" :[[12,13,15,14], [5,1,18,9], [3,16,11,7]]},
-    {"name" : "U", "e": [[0,1,2,3], [20, 16, 12, 4]], "c" :[[0,1,3,2], [17,13,5,21], [16, 12, 4,20]]},
-    {"name" : "F", "e": [[4,5,6,7], [2, 15, 8, 21]], "c" :[[4,5,7,6], [2, 12, 9, 23], [3, 14, 8, 21]]},
-    {"name" : "L", "e": [[20,21,22,23], [3, 7, 11,17]], "c" :[[20, 21, 23, 22 ], [0, 4, 8, 19], [2, 6, 10, 17]]},
-    {"name" : "D", "e": [[8,9,10,11], [6,14,18,22]], "c" :[[8,9,11,10], [6, 14, 18, 22], [7, 15, 19, 23]]},
-    {"name" : "B", "e": [[16,17,18,19], [0,23,10,13]], "c" :[[16, 17, 19, 18], [1, 20, 10, 15], [0, 22, 11, 13]]},
-)            
+faces = {
+     "R" : { "e": [[12,13,14,15], [1,19,9,5]], "c" :[[12,13,15,14], [5,1,18,9], [3,16,11,7]]},
+     "U" : { "e": [[0,1,2,3], [20, 16, 12, 4]], "c" :[[0,1,3,2], [17,13,5,21], [16, 12, 4,20]]},
+     "F" : { "e": [[4,5,6,7], [2, 15, 8, 21]], "c" :[[4,5,7,6], [2, 12, 9, 23], [3, 14, 8, 21]]},
+     "L" : { "e": [[20,21,22,23], [3, 7, 11,17]], "c" :[[20, 21, 23, 22 ], [0, 4, 8, 19], [2, 6, 10, 17]]},
+     "D" : { "e": [[8,9,10,11], [6,14,18,22]], "c" :[[8,9,11,10], [6, 14, 18, 22], [7, 15, 19, 23]]},
+     "B" : { "e": [[16,17,18,19], [0,23,10,13]], "c" :[[16, 17, 19, 18], [1, 20, 10, 15], [0, 22, 11, 13]]},
+
+    "r" : { "e": [[0, 18, 8, 4], [2, 16, 10, 6]], "c" :[]},
+    "u" : { "e": [[1, 20, 11, 14], [3, 22, 9, 12]], "c" :[]},
+}
+
+turn_faces = ["R", "U", "F", "L", "D", "B", "r", "u"]
+
+rotations = (
+
+)
 
 with open(r'src/c/cube3r.c', "w") as f:
 
-    for d in faces:
-        name = d["name"]
+    all_rotations = []
+    all_rotations_s = []
+    
+    f.write("const int ALL_ROTATION_LEN = {};\n\n".format(3 * len(turn_faces)) )
+
+    for name in turn_faces:
+        d = faces[name]
         edgeCycles = d["e"]
         cornerCycles = d["c"]
         writeRotationFuctions(f, name, edgeCycles, cornerCycles)
+        all_rotations.append(name + "_1")
+        all_rotations.append(name + "_2")
+        all_rotations.append(name + "_3")
+        all_rotations_s.append(name)
+        all_rotations_s.append(name+"2")
+        all_rotations_s.append(name+"'")
 
-    
+    f.write("t_rotation all_rotations[] = {\n")
+    f.write(",\n".join(all_rotations))
+    f.write("\n};\n")
+
+    f.write("char* all_rotations_s[] = {\n\"")
+    f.write("\",\n\"".join(all_rotations_s))
+    f.write("\"\n};\n")
