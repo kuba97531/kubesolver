@@ -167,11 +167,10 @@ void solve(cube* c, cube* cc, int levels, int cache_size){
     solver_cube* cache_c;
     solver_cube* cache_cc;
 
-    cache_c = malloc(cache_size  * sizeof(solver_cube));
+    cache_size /= 2;
 
-    printf("cache1 ready\n");
+    cache_c = malloc(cache_size  * sizeof(solver_cube));
     cache_cc = malloc(cache_size  * sizeof(solver_cube));
-    printf("cache2 ready\n");
 
     cache_c[0].cube = *c;
     cache_c[0].last_move = -1;
@@ -196,7 +195,7 @@ void solve(cube* c, cube* cc, int levels, int cache_size){
         level_start_c = level_end_c;
         level_end_c = new_level_end;
         level_c++;
-        printf("Level %d is done with %d K new items\n", level_c, (level_end_c - level_start_c) /1000 );
+        printf("Searching %d move solutions...\n", level_c + level_cc );
 
         find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc);
 
@@ -204,7 +203,7 @@ void solve(cube* c, cube* cc, int levels, int cache_size){
         level_start_cc = level_end_cc;
         level_end_cc = new_level_end;
         level_cc++;
-        printf("Level %d is done with %d K new items\n", level_c, (level_end_c - level_start_c) /1000 );
+        printf("Searching %d move solutions...\n", level_c + level_cc );
         find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc);
     }
 }
@@ -236,16 +235,6 @@ void set_all_rotations() {
 int main() {
     set_all_rotations();
 
-    for  (int i=0; i<18; i++) {
-        for  (int j=0; j<18; j++) {
-            printf("Rotations: %s and %s: ", all_rotations_s[i], all_rotations_s[j]);
-            if (is_sister_rotation(i, j)){
-                printf("SISTER!");
-            }
-            printf("\n");
-        }
-    }
-
     cube starting_position = empty_cube();
     cube attempted_position = empty_cube();
 
@@ -258,7 +247,7 @@ int main() {
     char buffer[100];
     scanf_result= scanf("%s", buffer);
     set_3gen(buffer);
-    printf("Using generator: %s", buffer);
+    printf("Using generator: %s\n", buffer);
 
     cache_size *= 1024 * 1024;
     cache_size /= sizeof(solver_cube);
@@ -268,7 +257,6 @@ int main() {
         int found = 0;
         for (int i=0; i<ALL_ROTATION_LEN ; i++) {
             if (!strcmp(buffer,all_rotations_s[i])) {
-                printf("apply %s\n", all_rotations_s[i]);
                 attempted_position = all_rotations[i](&attempted_position);
                 found = 1;
                 break;
