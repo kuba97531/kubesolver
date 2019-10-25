@@ -22,8 +22,19 @@ void sort_cubes(solver_cube* arr, int from, int to)
     qsort(arr + from, to - from, sizeof(solver_cube), cube_compare);
 }
 
+
+//ruf ldb
 int is_sister_rotation(int r1, int r2) {
     return r1 / 3 == r2 / 3;
+}
+
+int is_far_sister(int r1, int r2) {
+    r1 /= 3;
+    r2 /= 3;
+    if ( r1 == 0 && r2 == 3) return 1;
+    if ( r1 == 1 && r2 == 4) return 1;
+    if ( r1 == 2 && r2 == 5) return 1;
+    return 0;
 }
 
 
@@ -69,15 +80,22 @@ int remove_duplicates(solver_cube* arr, int from, int to) {
 int legal_rotations[24];
 int legal_rotations_len = 0;
 
+void print_cache_sequence(solver_cube* cache, int item);
+
 int generate_new_level(solver_cube* cache, int max_cache_size, int level_start, int level_end ) {
     int new_level_end = level_end;
     for (int c = level_start; c < level_end; c++) {
         cube current_cube = cache[c].cube;
         int current_rotation = cache[c].last_move;
+        int pre_current_rotation = c > 1 ? cache[cache[c].parent_index].last_move : -1;
 
         for (int i=0; i<legal_rotations_len; i++)  {
             int rotation = legal_rotations[i];
             if (c > 0 && is_sister_rotation(rotation, current_rotation))
+            {
+                continue;
+            }
+            if (c > 1 && is_sister_rotation(rotation, pre_current_rotation) && is_far_sister(rotation, current_rotation)) 
             {
                 continue;
             }

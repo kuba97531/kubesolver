@@ -26,7 +26,7 @@ typedef cube (*t_rotation)(cube*);
 
 void pp1(cube* cc) {
    cube c = *cc;
-   char x[] = "wgyrbo";
+   char x[] = "wgyrboz";
    fprintf(stderr,"http://software.rubikscube.info/icube/icube.php?size=100&stickers=");
     fprintf(stderr,"%c%c%c%c%c%c%c%c%c", x[c.corners[0]], x[c.edges[0]], x[c.corners[1]], x[c.edges[3]], 'w', x[c.edges[1]], x[c.corners[2]], x[c.edges[2]], x[c.corners[3]]);
     fprintf(stderr,"%c%c%c%c%c%c%c%c%c", x[c.corners[4]], x[c.edges[4]], x[c.corners[5]], x[c.edges[7]], 'g', x[c.edges[5]], x[c.corners[6]], x[c.edges[6]], x[c.corners[7]]);
@@ -34,7 +34,7 @@ void pp1(cube* cc) {
 }
 void pp2(cube* cc) {
    cube c = *cc;
-   char x[] = "wgyrbo";
+   char x[] = "wgyrboz";
    fprintf(stderr,"http://software.rubikscube.info/icube/icube.php?size=100&m=xy&fl=");
     fprintf(stderr,"%c%c%c%c%c%c%c%c%c", x[c.corners[9]], x[c.edges[9]], x[c.corners[11]], x[c.edges[8]], 'y', x[c.edges[10]], x[c.corners[8]], x[c.edges[11]], x[c.corners[10]]);
     fprintf(stderr,"%c%c%c%c%c%c%c%c%c", x[c.corners[23]], x[c.edges[22]], x[c.corners[22]], x[c.edges[21]], 'o', x[c.edges[23]], x[c.corners[21]], x[c.edges[20]], x[c.corners[20]]);
@@ -42,7 +42,7 @@ void pp2(cube* cc) {
 }
 
 void pp3(cube* cc) {
-   char x[] = "wgyrbo";
+   char x[] = "wgyrboz";
    cube c = *cc;
     fprintf(stderr,"%c%c%c%c%c%c%c%c%c ", x[c.corners[0]], x[c.edges[0]], x[c.corners[1]], x[c.edges[3]], 'w', x[c.edges[1]], x[c.corners[2]], x[c.edges[2]], x[c.corners[3]]);
     fprintf(stderr,"%c%c%c%c%c%c%c%c%c ", x[c.corners[4]], x[c.edges[4]], x[c.corners[5]], x[c.edges[7]], 'g', x[c.edges[5]], x[c.corners[6]], x[c.edges[6]], x[c.corners[7]]);
@@ -66,5 +66,28 @@ cube empty_cube() {
     for (int i = 0; i< 24; i++) {
         c.edges[i] = c.corners[i] = i/4;
     }
+    return c;
+}
+
+cube empty_cube_oll() {
+    cube c;
+    for (int i = 0; i< 24; i++) {
+        c.edges[i] = c.corners[i] = i/4;
+    }
+    c.edges[20] = 6;
+    c.edges[16] = 6;
+    c.edges[12] = 6;
+    c.edges[4] = 6;
+
+    c.corners[20] = 6;
+    c.corners[16] = 6;
+    c.corners[12] = 6;
+    c.corners[4] = 6;
+    c.corners[17] = 6;
+    c.corners[13] = 6;
+    c.corners[5] = 6;
+    c.corners[21] = 6;
+    
+
     return c;
 }

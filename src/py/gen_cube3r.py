@@ -47,7 +47,7 @@ def write_single_symmetry_function(name, edges, corners, colors):
     result = []
     result.append("cube {}(cube *other) {{ ".format(name))
     result.append("    cube result;")
-    result.append("    int color_swap[6] = {{ {} }};".format(", ".join(map(str,colors))))
+    result.append("    int color_swap[7] = {{ {}, 6 }};".format(", ".join(map(str,colors))))
     for i in range(24):
         if edges[i] != i:
             result.append("    result.edges[{}] = color_swap[other->edges[{}]];".format(i, edges[i]))
