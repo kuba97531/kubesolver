@@ -69,7 +69,7 @@ void assert_sorted(solver_cube_packed *a, int from, int size) {
             printf("SORTING FAILURE at i = %d\n", i);
             fprintf(stderr, "SORTING FAILURE\n");
             exit(0);
-            return -1;
+            return;
         }
     }
 }
