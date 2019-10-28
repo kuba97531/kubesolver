@@ -15,10 +15,19 @@
 #        to enviromental variables                                            #
 ###############################################################################
 
+ifeq ($(OS),Windows_NT)     # is Windows_NT on XP, 2000, 7, Vista, 10...
+    detected_OS := Windows
+	FILE_EXT = exe
+	OBJDIR   = obj_win
+else
+    detected_OS := $(shell uname)  # same as "uname -s"
+	FILE_EXT = out
+	OBJDIR   = obj_unix
+endif
+
 BUILD   ?= DEBUG
 NAME    ?= makesolver
 CC       = gcc
-OBJDIR   = obj
 SRCDIR   = src/c
 
 ###############################################################################
@@ -76,10 +85,6 @@ SRC_FILES = \
 SRC_ALWAYS_REBUILD_FILES = \
  solver.c
 
-#LIB_FILES = \
-# lib/win/TurboActivate.lib \
-# lib/win/DbgHelp.Lib
-
 ###############################################################################
 #   BUILD                                                                     #
 ###############################################################################
@@ -102,11 +107,10 @@ DEP = $(OBJ_FILES:%.o=%.d)
 OBJ_REBUILD_FILES = $(SRC_ALWAYS_REBUILD_FILES:%.c=$(OBJDIR)/%$(BUILD_POSTFIX).o)
 ALL_OBJ_FILES = $(OBJ_FILES) $(OBJ_REBUILD_FILES)
 
-
 ifeq ($(NAME),solver)
-	EXE_NAME    = $(EXE_PREFIX)$(NAME).out
+	EXE_NAME    = $(EXE_PREFIX)$(NAME).$(FILE_EXT)
 else
-	EXE_NAME    = $(NAME).out
+	EXE_NAME    = $(NAME).$(FILE_EXT)
 endif
 
 .DEFAULT_GOAL := $(EXE_NAME)
@@ -118,7 +122,7 @@ $(EXE_NAME): $(OBJ_FILES) $(OBJ_REBUILD_FILES) $(REFRESH_EXE)
 	@echo OK!
 
 $(OBJ_FILES): $(OBJDIR)/%$(BUILD_POSTFIX).o: $(SRCDIR)/%.c
-	#@$(CREATE_OBJ_DIR)
+	
 	@$(CC) $(CC_OPTIONS) -MMD -c $< -o $@
 	@$(CC) -c $(CC_OPTIONS) $< -o$@
 	@echo $(<:$(SRCDIR)/%=%)
