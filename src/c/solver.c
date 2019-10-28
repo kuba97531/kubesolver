@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<inttypes.h>
 #include<stdlib.h>
 #include<string.h>
 #include "cube3.h"
@@ -276,23 +277,22 @@ int main(void) {
     cube starting_position = empty_cube();
     cube attempted_position = empty_cube();
 
-    long unsigned cache_size;
-    int scanf_result = scanf("%lud", &cache_size);
+    int cache_size_in_MB;
+    uint64_t cache_size;
+    int scanf_result = scanf("%d", &cache_size_in_MB);
     if (scanf_result == 0) {
         printf("scanf error\n");
         exit(1);
     }
 
-    printf("cache_size = %lu Mega\n", cache_size);
-
-    
     char buffer[100];
     scanf_result= scanf("%s", buffer);
     set_3gen(buffer);
     printf("Using generator: %s\n", buffer);
 
-    cache_size *= 1024 * 1024;
+    cache_size = cache_size_in_MB * (uint64_t)(1024 * 1024);
     cache_size /= sizeof(solver_cube_packed);
+    printf("Allowing cache size of %u positions\n", (uint32_t)cache_size);
 
     while (scanf("%s", buffer) != EOF) {
         //applu rotation

@@ -1,5 +1,5 @@
 #include "cube3.h"
-#include<stdio.h>
+#include <stdio.h>
 
 int cube_compare(const void *s1, const void *s2)
     {
