@@ -1,25 +1,60 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include "cube3.c"
-#include "cube3r.c"
-
+#include "cube3.h"
+#include "cube3r.h"
+#include <stdint.h>
+#include "cube_compression.h"
 
 typedef struct 
 {
-    cube cube;
+    __uint128_t packed; 
     int8_t last_move;
     int parent_index;
 } solver_cube;
 
 int solver_cube_compare(const void *s1, const void *s2)
 {
-    return cube_compare(&((solver_cube *)s1)->cube, &((solver_cube *)s2)->cube);
+    cube c1, c2;
+    unpack_ce(&c1, ((solver_cube *)s1)->packed);
+    unpack_ce(&c2, ((solver_cube *)s2)->packed);
+    return cube_compare(&c1, &c2);
+}
+
+void print_mask(__uint128_t t) {
+    __uint128_t one = 1;
+    for (int i=0; i< 40*3; i++) {
+        if (t & ( one << i)) {
+            printf("X");
+        }
+        else {
+            printf("_");
+        }
+        if (i%3 == 2) {
+        printf(" ");
+        }
+    }
+    printf("\n");
+}
+
+void check_packing(cube c)
+{
+
+    cube other_c;
+    __uint128_t packed = pack_ce(&c);
+    unpack_ce(&other_c, packed);
+
+        if (cube_compare(&c, &other_c)) {
+            printf("WRONG pack\n");
+        }
+        else {
+        //  printf("ok pack\n");
+        }
 }
 
 void sort_cubes(solver_cube* arr, int from, int to) 
 {
-    qsort(arr + from, to - from, sizeof(solver_cube), cube_compare);
+    qsort(arr + from, to - from, sizeof(solver_cube), solver_cube_compare);
 }
 
 
@@ -85,7 +120,8 @@ void print_cache_sequence(solver_cube* cache, int item);
 int generate_new_level(solver_cube* cache, int max_cache_size, int level_start, int level_end ) {
     int new_level_end = level_end;
     for (int c = level_start; c < level_end; c++) {
-        cube current_cube = cache[c].cube;
+        cube current_cube;
+        unpack_ce(&current_cube, cache[c].packed);
         int current_rotation = cache[c].last_move;
         int pre_current_rotation = c > 1 ? cache[cache[c].parent_index].last_move : -1;
 
@@ -104,7 +140,8 @@ int generate_new_level(solver_cube* cache, int max_cache_size, int level_start, 
                 exit(-1);
                 return -1;
             }
-            cache[new_level_end].cube = all_rotations[rotation](&current_cube);
+            cube rotated = all_rotations[rotation](&current_cube);
+            cache[new_level_end].packed = pack_ce(&rotated) ;
             cache[new_level_end].last_move = rotation;
             cache[new_level_end].parent_index = c;
             new_level_end++;
@@ -114,7 +151,7 @@ int generate_new_level(solver_cube* cache, int max_cache_size, int level_start, 
     //qsort(cache + level_end, new_level_end - level_end, sizeof(cube), cube_compare);
 
     for (int i= level_end; i<new_level_end - 1; i++) {
-        if (cube_compare(cache+i, cache + i+1) > 0 )
+        if (solver_cube_compare(cache+i, cache + i+1) > 0 )
         {
             printf("SORTING FAILURE\n");
             fprintf(stderr, "SORTING FAILURE\n");
@@ -131,8 +168,9 @@ void print_cache_sequence(solver_cube* cache, int item) {
     
       print_cache_sequence(cache, cache[item].parent_index);
     
-     cube current_cube = cache[item].cube;
-     cube parent_cube = cache[cache[item].parent_index].cube;
+     cube current_cube, parent_cube;
+     unpack_ce(&current_cube, cache[item].packed);
+     unpack_ce(&parent_cube, cache[cache[item].parent_index].packed);
 
      for (int i=0; i<ALL_ROTATION_LEN; i++)  {
          cube rotato = all_rotations[i](&parent_cube);
@@ -146,11 +184,12 @@ void print_cache_sequence(solver_cube* cache, int item) {
 void print_reverse_cache_sequence(solver_cube* cache, int item) {
     if (item ==0 ) return;    
 
-    cube current_cube = cache[item].cube;
-    cube parent_cube = cache[cache[item].parent_index].cube;
+     cube current_cube, parent_cube;
+     unpack_ce(&current_cube, cache[item].packed);
+     unpack_ce(&parent_cube, cache[cache[item].parent_index].packed);
 
     for (int i=0; i<ALL_ROTATION_LEN; i++)  {
-            cube rotato = all_rotations[i](&current_cube);
+        cube rotato = all_rotations[i](&current_cube);
         if (cube_compare(&parent_cube, &rotato) == 0) {
             printf("%s ", all_rotations_s[i]);
             break;
@@ -190,12 +229,12 @@ void solve(cube* c, cube* cc, int levels, int cache_size){
     cache_c = malloc(cache_size  * sizeof(solver_cube));
     cache_cc = malloc(cache_size  * sizeof(solver_cube));
 
-    cache_c[0].cube = *c;
+    cache_c[0].packed = pack_ce(c);
     cache_c[0].last_move = -1;
     cache_c[0].parent_index = -1;
     
 
-    cache_cc[0].cube = *cc;
+    cache_cc[0].packed = pack_ce(cc);
     cache_cc[0].last_move = -1;
     cache_cc[0].parent_index = -1;
 
@@ -250,7 +289,7 @@ void set_all_rotations() {
     }
 }
 
-int main() {
+int main(void) {
     set_all_rotations();
 
     cube starting_position = empty_cube();
@@ -281,7 +320,11 @@ int main() {
             }
         }
         if (found) continue;
-        if (!strcmp(buffer,"print")) {  link(&attempted_position, "print"); printf("\n"); }
+        if (!strcmp(buffer,"print")) { 
+             link(&attempted_position, "print"); 
+             check_packing(attempted_position);
+             printf("\n");
+              }
         else if (!strcmp(buffer,"clear")) { starting_position = empty_cube(); attempted_position = empty_cube(); }
         else if (!strcmp(buffer,"solve")) { 
             printf("try solve\n");

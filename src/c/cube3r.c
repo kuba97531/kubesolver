@@ -1,3 +1,4 @@
+#include "cube3r.h"
 cube R_1(cube *other) { 
     cube result = *other;
     result.edges[1] = other->edges[5];
@@ -772,7 +773,6 @@ cube zz(cube *other) {
     return result;
 }
 
-const int ALL_ROTATION_LEN = 24;
 
 t_rotation all_rotations[] = {
 R_1,

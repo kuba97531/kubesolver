@@ -1,8 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include <string.h>
-#include "cube3.c"
-#include "cube3r.c"
+#include "cube3.h"
+#include "cube3r.h"
 
 int main() {
     cube cc = empty_cube();

@@ -10,6 +10,7 @@ def apply6permutation(target, permutation):
     for i in range(6):
         target[i] = permutation[target[i]]
 
+
 def write_single_rotation_function(name, edges, corners):
     result = []
     result.append("cube {}(cube *other) {{ ".format(name))
@@ -24,7 +25,7 @@ def write_single_rotation_function(name, edges, corners):
     result.append("}")
     return result;   
 
-def writeRotationFuctions(f, name, edgeCycles, cornerCycles):
+def writeRotationFuctions(fc, fh, name, edgeCycles, cornerCycles):
     edges = list(range(24))
     corners = list(range(24))
 
@@ -36,12 +37,17 @@ def writeRotationFuctions(f, name, edgeCycles, cornerCycles):
             apply4Cycle(corners, cc)
         lines = write_single_rotation_function("{}_{}".format(name, i+1), edges, corners)
         for l in lines:
-            f.write(l)
-            f.write("\n")
+            fc.write(l)
+            fc.write("\n")
             #print(l)
+        fc.write("\n")
 
-        f.write("\n")
+        fh.write(get_function_header("{}_{}".format(name, i+1)))
+        fh.write("\n")
         #print()
+
+def get_function_header(name):
+    return "cube {}(cube *other); ".format(name)
 
 def write_single_symmetry_function(name, edges, corners, colors):
     result = []
@@ -83,7 +89,7 @@ basic_symmetries = {
     "z" : { "faces" : ["F", "B","B","B", "S"], "centers" : [3,1,5,2,4,0]},
 }
 
-def write_symmetry_function(f, name, applied_symmetries ):
+def write_symmetry_function(fc, fh, name, applied_symmetries ):
     edges = list(range(24))
     corners = list(range(24))
     centers = list(range(6))
@@ -99,24 +105,35 @@ def write_symmetry_function(f, name, applied_symmetries ):
 
         apply6permutation(centers, s["centers"])
 
-    lines = write_single_symmetry_function("{}".format(name), edges, corners, centers)
+    lines = write_single_symmetry_function(name, edges, corners, centers)
     for l in lines:
-        f.write(l)
-        f.write("\n")
+        fc.write(l)
+        fc.write("\n")
         #print(l)
+    header = get_function_header(name)
+    fh.write(header)
+    fh.write("\n")
 
-    f.write("\n")
+    fc.write("\n")
 
-with open(r'src/c/cube3r.c', "w") as f:
+
+with open(r'src/c/cube3r.c', "w") as fc:
+  with open(r'src/c/cube3r.h', "w") as fh:
 
     all_rotations = []
     all_rotations_s = []
     
+    fh.write("#include \"cube3.h\"\n")
+    fh.write("#ifndef CUBE3_R\n")
+    fh.write("#define CUBE3_R\n")
+
+    fc.write("#include \"cube3r.h\"\n")
+
     for name in turn_faces:
         d = faces[name]
         edgeCycles = d["e"]
         cornerCycles = d["c"]
-        writeRotationFuctions(f, name, edgeCycles, cornerCycles)
+        writeRotationFuctions(fc, fh, name, edgeCycles, cornerCycles)
         all_rotations.append(name + "_1")
         all_rotations.append(name + "_2")
         all_rotations.append(name + "_3")
@@ -126,24 +143,25 @@ with open(r'src/c/cube3r.c', "w") as f:
 
     def bs(x):
         return basic_symmetries[x]
-    write_symmetry_function(f, "x", map(bs, ["x"]) ) 
-    write_symmetry_function(f, "xx", map(bs, ["x", "x"]) ) 
-    write_symmetry_function(f, "xxx", map(bs, ["x", "x", "x"]) ) 
-    write_symmetry_function(f, "y", map(bs, ["y"]) )
-    write_symmetry_function(f, "z", map(bs, ["z"]) )
-    write_symmetry_function(f, "zz", map(bs, ["y", "y", "y", "x", "y",  ]) )
+    write_symmetry_function(fc, fh, "x", map(bs, ["x"]) ) 
+    write_symmetry_function(fc, fh, "xx", map(bs, ["x", "x"]) ) 
+    write_symmetry_function(fc, fh, "xxx", map(bs, ["x", "x", "x"]) ) 
+    write_symmetry_function(fc, fh, "y", map(bs, ["y"]) )
+    write_symmetry_function(fc, fh, "z", map(bs, ["z"]) )
+    write_symmetry_function(fc, fh, "zz", map(bs, ["y", "y", "y", "x", "y",  ]) )
     
     for ss in ["x", "xx", "xxx", "y", "z", "zz"]:
         all_rotations.append(ss)
         all_rotations_s.append(ss)
     
-    f.write("const int ALL_ROTATION_LEN = {};\n\n".format(len(all_rotations_s)) )
+    fh.write("const int ALL_ROTATION_LEN = {};\n\n".format(len(all_rotations_s)) )
 
 
-    f.write("t_rotation all_rotations[] = {\n")
-    f.write(",\n".join(all_rotations))
-    f.write("\n};\n")
+    fh.write("t_rotation all_rotations[] = {\n")
+    fh.write(",\n".join(all_rotations))
+    fh.write("\n};\n")
 
-    f.write("char* all_rotations_s[] = {\n\"")
-    f.write("\",\n\"".join(all_rotations_s))
-    f.write("\"\n};\n")
+    fh.write("char* all_rotations_s[] = {\n\"")
+    fh.write("\",\n\"".join(all_rotations_s))
+    fh.write("\"\n};\n")
+    fh.write("\n#endif\n")

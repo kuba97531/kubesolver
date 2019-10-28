@@ -1,9 +1,5 @@
-#include<stdint.h>
-
-typedef struct {
-    uint8_t edges[24];
-    uint8_t corners[24];
-} cube;
+#include "cube3.h"
+#include<stdio.h>
 
 int cube_compare(const void *s1, const void *s2)
     {
@@ -21,8 +17,6 @@ int cube_compare(const void *s1, const void *s2)
       }
       return 0;
     }
-
-typedef cube (*t_rotation)(cube*);
 
 void pp1(cube* cc) {
    cube c = *cc;
@@ -61,7 +55,7 @@ void link(cube* cc, char* name) {
     fprintf(stderr,"\" /> %s <br> \n", name);
 }
 
-cube empty_cube() {
+cube empty_cube(void) {
     cube c;
     for (int i = 0; i< 24; i++) {
         c.edges[i] = c.corners[i] = i/4;
@@ -69,7 +63,7 @@ cube empty_cube() {
     return c;
 }
 
-cube empty_cube_oll() {
+cube empty_cube_oll(void) {
     cube c;
     for (int i = 0; i< 24; i++) {
         c.edges[i] = c.corners[i] = i/4;
