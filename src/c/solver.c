@@ -283,6 +283,7 @@ void find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, 
             print_cache_sequence(c, f);
             print_reverse_cache_sequence(cc, ff);
             printf("\n");
+            fflush(stdout);
             f++;
             ff++;
         }
