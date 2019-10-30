@@ -19,13 +19,26 @@ typedef struct
     int8_t last_move;
 } solver_cube_unpacked;
 
+// int solver_cube_compare(const void *s1, const void *s2)
+// {
+//     cube c1, c2;
+//     int8_t last_move;
+//     unpack_ce(&c1, &last_move, ((solver_cube_packed *)s1)->packed);
+//     unpack_ce(&c2, &last_move, ((solver_cube_packed *)s2)->packed);
+//     return cube_compare(&c1, &c2);
+// }
+
 int solver_cube_compare(const void *s1, const void *s2)
 {
-    cube c1, c2;
-    int8_t last_move;
-    unpack_ce(&c1, &last_move, ((solver_cube_packed *)s1)->packed);
-    unpack_ce(&c2, &last_move, ((solver_cube_packed *)s2)->packed);
-    return cube_compare(&c1, &c2);
+    __uint128_t p1 = ((solver_cube_packed *)s1)->packed >> 8;
+    __uint128_t p2 = ((solver_cube_packed *)s2)->packed >> 8;
+    if (p1 > p2) {
+        return 1;
+    }
+    else if (p2 > p1) {
+        return -1;
+    }
+    return 0;
 }
 
 #define MERGE_SORT_SWAP(aaaaa,bbbbbb) {solver_cube_packed zzzzzzz = aaaaa; aaaaa= bbbbbb; bbbbbb = zzzzzzz;}
