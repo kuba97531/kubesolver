@@ -11,7 +11,6 @@
 typedef struct 
 {
     __uint128_t packed; 
-    int parent_index;
 } solver_cube_packed;
 
 typedef struct 
@@ -193,8 +192,8 @@ int legal_rotations_len = 0;
 
 void print_cache_sequence(solver_cube_packed* cache, int item);
 
-int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_start, int level_end, solver_cube_packed* mergesort_temp) {
-    int new_level_end = level_end;
+int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_start, int level_end, int new_level_start, solver_cube_packed* mergesort_temp) {
+    int new_level_end = new_level_start;
     for (int c = level_start; c < level_end; c++) {
         solver_cube_unpacked current_unpacked;
         
@@ -214,7 +213,6 @@ int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_
             }
             cube rotated = all_rotations[rotation](&current_unpacked.cube);
             cache[new_level_end].packed = pack_ce(&rotated, rotation);
-            cache[new_level_end].parent_index = c;
             new_level_end++;
         }
     }
@@ -233,41 +231,63 @@ int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_
     return level_end;
 }
 
-void print_cache_sequence(solver_cube_packed* cache, int item) {
-     if (item == 0 ) return;
-    
-      print_cache_sequence(cache, cache[item].parent_index);
-    
-     cube current_cube, parent_cube;
-     int8_t last_move;
-     unpack_ce(&current_cube, &last_move, cache[item].packed);
-     unpack_ce(&parent_cube, &last_move, cache[cache[item].parent_index].packed);
-
-     for (int i=0; i<ALL_ROTATION_LEN; i++)  {
-         cube rotato = all_rotations[i](&parent_cube);
-         if (cube_compare(&current_cube, &rotato) == 0) {
-             printf("%s ", all_rotations_s[i]);
-             break;
-         }
-     }
+int reverse_rotation(int rotation_id) {
+    int r3 = rotation_id %3;
+    return rotation_id - r3 + 2 - r3;
 }
 
-void print_reverse_cache_sequence(solver_cube_packed* cache, int item) {
-    if (item ==0 ) return;    
-
-     cube current_cube, parent_cube;
+void print_cache_sequence(solver_cube_packed* cache, int original_item) {
+     if (original_item == 0 ) return;
+      
+     cube current_cube;
      int8_t last_move;
-     unpack_ce(&current_cube, &last_move, cache[item].packed);
-     unpack_ce(&parent_cube, &last_move, cache[cache[item].parent_index].packed);
 
-    for (int i=0; i<ALL_ROTATION_LEN; i++)  {
-        cube rotato = all_rotations[i](&current_cube);
-        if (cube_compare(&parent_cube, &rotato) == 0) {
-            printf("%s ", all_rotations_s[i]);
+     unpack_ce(&current_cube, &last_move, cache[original_item].packed);
+
+    int item = original_item;
+    while (cache[item].packed != 0) {
+        item--;
+    }
+    
+    cube rotato = all_rotations[reverse_rotation(last_move)](&current_cube);
+    solver_cube_packed expected_parent;
+    expected_parent.packed = pack_ce(&rotato, 0);
+    
+    while(item > 0 && cache[--item].packed > 0) {
+        if (solver_cube_compare(&cache[item], &expected_parent) == 0) {
+            print_cache_sequence(cache, item);
+            printf("%s ", all_rotations_s[last_move]);
             break;
         }
     }
-    print_reverse_cache_sequence(cache, cache[item].parent_index);
+    
+}
+
+void print_reverse_cache_sequence(solver_cube_packed* cache, int original_item) {
+    if (original_item == 0) return;    
+
+    cube current_cube;
+    int8_t last_move;
+    
+
+    unpack_ce(&current_cube, &last_move, cache[original_item].packed);
+     
+    int item = original_item;
+    while (cache[item].packed != 0) {
+         item--;
+    }
+
+    cube rotato = all_rotations[reverse_rotation(last_move)](&current_cube);
+    solver_cube_packed expected_parent;
+    expected_parent.packed = pack_ce(&rotato, 0);
+
+    while(item > 0 && cache[--item].packed > 0) {
+        if (solver_cube_compare(&cache[item], &expected_parent) == 0) {
+            printf("%s ", all_rotations_s[reverse_rotation(last_move)]);
+            print_reverse_cache_sequence(cache, item);
+            break;
+        }
+    }
 }
 
 
@@ -314,11 +334,9 @@ void solve(cube* c, cube* cc, int levels, int cache_size){
     }
 
     cache_c[0].packed = pack_ce(c, 0);
-    cache_c[0].parent_index = -1;
     
     cache_cc[0].packed = pack_ce(cc, 0);
-    cache_cc[0].parent_index = -1;
-
+    
     int level_start_c = 0;
     int level_end_c = 1;
 
@@ -329,16 +347,19 @@ void solve(cube* c, cube* cc, int levels, int cache_size){
     int level_cc = 0;
 
     for (int i=0; i<levels; i++) {
-        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, mergesort_cache);
-        level_start_c = level_end_c;
+        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache);
+        cache_c[level_end_c].packed = 0;
+
+        level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
         level_c++;
         printf("Searching %d move solutions...\n", level_c + level_cc );
 
         find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc);
 
-        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, mergesort_cache);
-        level_start_cc = level_end_cc;
+        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache);
+        cache_cc[level_end_cc].packed = 0;
+        level_start_cc = level_end_cc + 1;
         level_end_cc = new_level_end;
         level_cc++;
         printf("Searching %d move solutions...\n", level_c + level_cc );
