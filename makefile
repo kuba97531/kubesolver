@@ -4,7 +4,7 @@
 #       make BUILD=RELEASE : slow release build (produces rsolver.exe)        #
 #       make build_all     : builds all versions for release purposes         #
 #       make clean         : removes object and default exe files             #
-#       make NAME=piosolver: debug build producing piosolver.exe              #
+#       make NAME=kubesolver: debug build producing kubesolver.exe            #
 #                                                                             #
 #   REMARKS:                                                                  #
 #       -When NAME is left as default make produces:                          #

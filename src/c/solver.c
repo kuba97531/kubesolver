@@ -370,7 +370,7 @@ void solve(cube* c, cube* cc, int levels, int cache_size){
 void set_3gen(char* chs)
 {
     legal_rotations_len = 0;
-    for (int i=0; i<18; i++)
+    for (int i=0; i<ALL_ROTATION_LEN; i++)
     {
         char c = all_rotations_s[i][0];
         for (size_t z = 0; z < strlen(chs); z++)
@@ -415,7 +415,7 @@ int main(void) {
     printf("Allowing cache size of %u positions\n", (uint32_t)cache_size);
 
     while (scanf("%s", buffer) != EOF) {
-        //applu rotation
+        //apply rotation
         int found = 0;
         for (int i=0; i<ALL_ROTATION_LEN ; i++) {
             if (!strcmp(buffer,all_rotations_s[i])) {
@@ -433,6 +433,10 @@ int main(void) {
         else if (!strcmp(buffer,"clear")) { starting_position = empty_cube(); attempted_position = empty_cube(); }
         else if (!strcmp(buffer,"solve")) { 
             printf("try solve\n");
+            solve(&attempted_position, &starting_position, 20, cache_size);
+         }
+         else if (!strcmp(buffer,"reconstruct")) { 
+            printf("try reconstruct\n");
             solve(&starting_position, &attempted_position, 20, cache_size);
          }
          else {
