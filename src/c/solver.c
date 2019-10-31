@@ -336,7 +336,7 @@ void find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, 
     }
 }
 
-void solve(cube* c, cube* cc, int levels, int cache_size){
+void solve(cube* c, cube* cc, int levels, uint64_t cache_size){
     solver_cube_packed* cache_c;
     solver_cube_packed* cache_cc;
     solver_cube_packed* mergesort_cache;
@@ -346,10 +346,13 @@ void solve(cube* c, cube* cc, int levels, int cache_size){
     cache_c = malloc(cache_size  * sizeof(solver_cube_packed));
     cache_cc = malloc(cache_size  * sizeof(solver_cube_packed));
     mergesort_cache = malloc(cache_size  * sizeof(solver_cube_packed));
+    if (cache_c == NULL || cache_cc == NULL) {
+        printf("not enough memory\n");
+        exit(0);
+    }
 
     if (mergesort_cache == NULL) {
-        printf("Failed to allocate mergesort cache\n");
-        exit(0);
+        printf("Failed to allocate enough memory for extra cache - using qsort instead of mergesort\n");
     }
 
     cache_c[0].packed = pack_ce(c, 0);
