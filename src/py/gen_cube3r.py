@@ -136,51 +136,51 @@ def write_symmetry_function(fc, fh, name, applied_symmetries):
 
     fc.write("\n")
 
+if __name__ == "__main__":
+    with open(r'src/c/cube3r.c', "w") as fc:
+        with open(r'src/c/cube3r.h', "w") as fh:
 
-with open(r'src/c/cube3r.c', "w") as fc:
-  with open(r'src/c/cube3r.h', "w") as fh:
+            all_rotations = []
+            all_rotations_s = []
+            
+            fh.write("#include \"cube3.h\"\n")
+            fh.write("#ifndef CUBE3_R\n")
+            fh.write("#define CUBE3_R\n")
 
-    all_rotations = []
-    all_rotations_s = []
-    
-    fh.write("#include \"cube3.h\"\n")
-    fh.write("#ifndef CUBE3_R\n")
-    fh.write("#define CUBE3_R\n")
+            fc.write("#include \"cube3r.h\"\n")
 
-    fc.write("#include \"cube3r.h\"\n")
+            def append_rotation_name(name):
+                all_rotations.append(name + "_1")
+                all_rotations.append(name + "_2")
+                all_rotations.append(name + "_3")
+                all_rotations_s.append(name)
+                all_rotations_s.append(name+"2")
+                all_rotations_s.append(name+"'")
 
-    def append_rotation_name(name):
-        all_rotations.append(name + "_1")
-        all_rotations.append(name + "_2")
-        all_rotations.append(name + "_3")
-        all_rotations_s.append(name)
-        all_rotations_s.append(name+"2")
-        all_rotations_s.append(name+"'")
+            for name in turn_faces:
+                d = faces[name]
+                edgeCycles = d["e"]
+                cornerCycles = d["c"]
+                writeRotationFuctions(fc, fh, name, edgeCycles, cornerCycles)
+                append_rotation_name(name)
 
-    for name in turn_faces:
-        d = faces[name]
-        edgeCycles = d["e"]
-        cornerCycles = d["c"]
-        writeRotationFuctions(fc, fh, name, edgeCycles, cornerCycles)
-        append_rotation_name(name)
+            def bs(x):
+                return basic_symmetries[x]
 
-    def bs(x):
-        return basic_symmetries[x]
+            for name in wide_moves_and_rotations:
+                for i in (1,2,3):
+                    write_symmetry_function(fc, fh, "%s_%d" % (name, i), map(bs, [name] * i) ) 
+                append_rotation_name(name)
 
-    for name in wide_moves_and_rotations:
-        for i in (1,2,3):
-            write_symmetry_function(fc, fh, "%s_%d" % (name, i), map(bs, [name] * i) ) 
-        append_rotation_name(name)
+            fh.write("#define ALL_ROTATION_LEN {}\n\n".format(len(all_rotations_s)) )
+            fh.write("extern t_rotation all_rotations[];\n")
+            fh.write("extern char* all_rotations_s[];\n")
 
-    fh.write("#define ALL_ROTATION_LEN {}\n\n".format(len(all_rotations_s)) )
-    fh.write("extern t_rotation all_rotations[];\n")
-    fh.write("extern char* all_rotations_s[];\n")
+            fc.write("t_rotation all_rotations[] = {\n")
+            fc.write(",\n".join(all_rotations))
+            fc.write("\n};\n")
 
-    fc.write("t_rotation all_rotations[] = {\n")
-    fc.write(",\n".join(all_rotations))
-    fc.write("\n};\n")
-
-    fc.write("char* all_rotations_s[] = {\n\"")
-    fc.write("\",\n\"".join(all_rotations_s))
-    fc.write("\"\n};\n")
-    fh.write("\n#endif\n")
+            fc.write("char* all_rotations_s[] = {\n\"")
+            fc.write("\",\n\"".join(all_rotations_s))
+            fc.write("\"\n};\n")
+            fh.write("\n#endif\n")
