@@ -1,5 +1,6 @@
 #include "cube3.h"
 #include <stdio.h>
+#include <assert.h>
 
 int cube_compare(const void *s1, const void *s2)
     {
@@ -73,6 +74,37 @@ cube empty_cube_oll(void) {
     c.edges[12] = 6;
     c.edges[4] = 6;
 
+    c.corners[20] = 3;
+    c.corners[16] = 3;
+    c.corners[12] = 3;
+    c.corners[4] = 3;
+    c.corners[17] = 1;
+    c.corners[13] = 1;
+    c.corners[5] = 1;
+    c.corners[21] = 1;
+    return c;
+}
+
+cube empty_cube_f2l(void) {
+    cube c;
+    for (int i = 0; i< 24; i++) {
+        c.edges[i] = c.corners[i] = i/4;
+    }
+
+    c.edges[0] = 6;
+    c.edges[1] = 6;
+    c.edges[2] = 6;
+    c.edges[3] = 6;
+
+    c.edges[20] = 6;
+    c.edges[16] = 6;
+    c.edges[12] = 6;
+    c.edges[4] = 6;
+
+    c.corners[0] = 6;
+    c.corners[1] = 6;
+    c.corners[2] = 6;
+    c.corners[3] = 6;
     c.corners[20] = 6;
     c.corners[16] = 6;
     c.corners[12] = 6;
@@ -81,7 +113,44 @@ cube empty_cube_oll(void) {
     c.corners[13] = 6;
     c.corners[5] = 6;
     c.corners[21] = 6;
-    
-
     return c;
 }
+
+int cross_edges[8] = {8,9,10,11, 6,14,18,22};
+
+int slot1[5] = { 11, 15, 18, 13, 19 };
+int slot2[5] = { 10, 19, 22, 17, 23 };
+int slot3[5] = { 8, 6, 23, 21, 7 };
+int slot4[5] = { 10, 19, 22, 17, 23 };
+
+cube empty_cube_cross(void) {
+    cube c;
+    for (int ii = 0; ii< 24; ii++) {
+        c.edges[ii] = c.corners[ii] = 6;
+    }
+    for (int ii = 0; ii < 8; ii++) {
+        int i = cross_edges[ii];
+        c.edges[i] = i/4;
+    }   
+    return c;
+}
+
+cube init_slot(cube c, int ii) {
+    cube cc = c;
+    int *slot;
+    assert(ii >=1 && ii <=4);
+    if (ii == 1) slot = slot1;
+    if (ii == 2) slot = slot2;
+    if (ii == 3) slot = slot3;
+    if (ii == 4) slot = slot4;
+    for (int i=0; i<3; i++) {
+        int x = slot[i];
+        cc.corners[x] = x/4;
+    }
+    for (int i=3; i<5; i++) {
+        int x = slot[i];
+        cc.edges[x] = x/4;
+    }
+    return cc;
+}
+

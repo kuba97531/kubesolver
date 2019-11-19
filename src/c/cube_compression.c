@@ -2,7 +2,11 @@
 #include "cube_compression.h"
 #include <stdint.h>
 #include <assert.h>
-int unpack_secret [36] = {0, 3, 0, 4, 5, 1, 5, 0, 3, 0, 0, 2, 0, 5, 0, 1, 3, 4, 1, 2, 4, 0, 0, 0, 3, 0, 5, 2, 0, 0, 4, 0, 1, 0, 2, 0};
+
+int unpack_secret [43] = {0, 3, 0, 4, 5, 1, 5, 0, 3, 0, 0, 2, 0, 5, 0, 1, 3, 4, 1, 2, 4, 0, 0, 0, 3, 0, 5, 2, 0, 0, 4, 0, 1, 0, 2, 0, 6,6,6,6,6,6, 6};
+// this means : if you have a corner where left color is X, right color is Y then top color is unpack_secret[X*6 + Y].
+// For packing cubes with ghost corners must always use either fully occupied corners or fully empty
+// for OLL for packing it's recommended to encode 4 identical corner pieces.
 
 int8_t unpack_last_move(__uint128_t compressed) {
     return (int8_t)compressed;
@@ -37,6 +41,7 @@ void unpack_ce(cube *c, int8_t *last_move, __uint128_t compressed) {
     corners[9] = unpack_secret[ corners[14] * 6 + corners[7]];
     corners[10] = unpack_secret[ corners[22] * 6 + corners[19]];
     corners[11] = unpack_secret[ corners[18] * 6 + corners[15]];
+    
 }
 
 __uint128_t pack_ce (cube *c, int8_t last_move) {

@@ -143,7 +143,7 @@ void check_packing(cube c, int8_t last_move)
         //printf("ok pack\n");
     }
     if (last_move != unpacked_last_move) {
-        printf("WRONG pack of cube\n");
+        printf("WRONG pack of cube last_move\n");
     }
 }
 
@@ -448,11 +448,42 @@ int main(void) {
         }
         if (found) continue;
         if (!strcmp(buffer,"print")) { 
-             link(&attempted_position, "print"); 
+             link(&starting_position, "print"); 
              check_packing(attempted_position, 17);
              printf("\n");
               }
-        else if (!strcmp(buffer,"clear")) { starting_position = empty_cube(); attempted_position = empty_cube(); }
+        else if (!strcmp(buffer,"clear")) { 
+            starting_position = empty_cube();
+            attempted_position = empty_cube(); 
+        }
+        else if (!strcmp(buffer,"clear_oll")) { 
+            starting_position = empty_cube_oll();
+            attempted_position = empty_cube_oll(); 
+        }
+        else if (!strcmp(buffer,"clear_f2l")) { 
+            starting_position = empty_cube_f2l();
+            attempted_position = empty_cube_f2l(); 
+        }
+        else if (!strcmp(buffer,"clear_cross")) { 
+            starting_position = empty_cube_cross();
+            attempted_position = starting_position; 
+        }
+        else if (!strcmp(buffer,"init_slot_1")) { 
+            starting_position = init_slot(starting_position, 1);
+            attempted_position = starting_position; 
+        }
+        else if (!strcmp(buffer,"init_slot_2")) { 
+            starting_position = init_slot(starting_position, 2);
+            attempted_position = starting_position; 
+        }
+        else if (!strcmp(buffer,"init_slot_3")) { 
+            starting_position = init_slot(starting_position, 3);
+            attempted_position = starting_position; 
+        }
+        else if (!strcmp(buffer,"init_slot_4")) { 
+            starting_position = init_slot(starting_position, 4);
+            attempted_position = starting_position; 
+        }        
         else if (!strcmp(buffer,"solve")) { 
             printf("try solve\n");
             solve(&attempted_position, &starting_position, 9, cache_size);
