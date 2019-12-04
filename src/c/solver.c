@@ -454,46 +454,58 @@ int main(void) {
         }
         if (found) continue;
         if (!strcmp(buffer,"print")) { 
-             link(&starting_position, "print"); 
+             link(&attempted_position, "print"); 
              check_packing(attempted_position, 17);
              printf("\n");
               }
-        else if (!strcmp(buffer,"clear")) { 
-            starting_position = empty_cube();
-            attempted_position = empty_cube(); 
+        else if (!strcmp(buffer,"init_full_cube")) { 
+            attempted_position = starting_position = full_cube();
         }
-        else if (!strcmp(buffer,"clear_oll")) { 
-            starting_position = empty_cube_oll();
-            attempted_position = empty_cube_oll(); 
+        else if (!strcmp(buffer,"init_empty_cube")) { 
+            attempted_position = starting_position = empty_cube();
         }
-        else if (!strcmp(buffer,"clear_f2l")) { 
-            starting_position = empty_cube_f2l();
-            attempted_position = empty_cube_f2l(); 
+        else if (!strcmp(buffer,"add_corner_orientation")) { 
+            starting_position = attempted_position = add_missing_corner_orientation(starting_position);
         }
-        else if (!strcmp(buffer,"clear_cross")) { 
-            starting_position = empty_cube_cross();
-            attempted_position = starting_position; 
+        else if (!strcmp(buffer,"add_corners")) { 
+            starting_position = attempted_position = add_missing_corners(starting_position);
         }
-        else if (!strcmp(buffer,"init_slot_1")) { 
-            printf("Init slot 1\n");
-            starting_position = init_slot(starting_position, 1);
-            attempted_position = starting_position; 
+        else if (!strcmp(buffer,"add_edges_orientation")) { 
+            starting_position = attempted_position = add_missing_edges_orientation(starting_position);
         }
-        else if (!strcmp(buffer,"init_slot_2")) { 
-            printf("Init slot 2\n");
-            starting_position = init_slot(starting_position, 2);
-            attempted_position = starting_position; 
+        else if (!strcmp(buffer,"add_edges")) { 
+            starting_position = attempted_position = add_missing_edges(starting_position);
         }
-        else if (!strcmp(buffer,"init_slot_3")) { 
-            printf("Init slot 3\n");
-            starting_position = init_slot(starting_position, 3);
-            attempted_position = starting_position; 
+        else if (!strcmp(buffer,"add_f2l")) { 
+            starting_position = attempted_position = add_f2l(starting_position);
         }
-        else if (!strcmp(buffer,"init_slot_4")) { 
-            printf("Init slot 4\n");
-            starting_position = init_slot(starting_position, 4);
-            attempted_position = starting_position; 
-        }        
+        else if (!strcmp(buffer,"add_cross")) { 
+            starting_position = attempted_position = add_cross(starting_position);
+        }
+        else if (!strcmp(buffer,"add_cross_piece_f")) { 
+            starting_position = attempted_position = add_cross_piece(starting_position, 0);
+        }
+        else if (!strcmp(buffer,"add_cross_piece_r")) { 
+            starting_position = attempted_position = add_cross_piece(starting_position, 1);
+        }
+        else if (!strcmp(buffer,"add_cross_piece_b")) { 
+            starting_position = attempted_position = add_cross_piece(starting_position, 2);
+        }
+        else if (!strcmp(buffer,"add_cross_piece_l")) { 
+            starting_position = attempted_position = add_cross_piece(starting_position, 3);
+        }
+        else if (!strcmp(buffer,"add_slot_fr")) { 
+            starting_position = attempted_position = add_slot(starting_position, 1);
+        }
+        else if (!strcmp(buffer,"add_slot_fl")) { 
+            starting_position = attempted_position = add_slot(starting_position, 2);
+        }
+        else if (!strcmp(buffer,"add_slot_br")) { 
+            starting_position = attempted_position = add_slot(starting_position, 3);
+        }
+        else if (!strcmp(buffer,"add_slot_bl")) { 
+            starting_position = attempted_position = add_slot(starting_position, 4);
+        }
         else if (!strcmp(buffer,"solve")) { 
             printf("try solve\n");
             solve(&attempted_position, &starting_position, 11, cache_size);
@@ -503,7 +515,8 @@ int main(void) {
             solve(&starting_position, &attempted_position, 11, cache_size);
          }
          else {
-             printf("Unknown command %s\n", buffer);
+             printf("ERROR: Unknown command %s\n", buffer);
+             exit(1);
          }
     }
 }
