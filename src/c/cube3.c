@@ -118,9 +118,9 @@ cube empty_cube_f2l(void) {
 
 int cross_edges[8] = {8,9,10,11, 6,14,18,22};
 
-int slot1[5] = { 11, 15, 18, 13, 19 };
-int slot2[5] = { 10, 19, 22, 17, 23 };
-int slot3[5] = { 8, 6, 23, 21, 7 };
+int slot1[5] = { 7, 9, 14, 5, 15 };
+int slot2[5] = { 8, 6, 23, 21, 7 };
+int slot3[5] = { 11, 15, 18, 13, 19 };
 int slot4[5] = { 10, 19, 22, 17, 23 };
 
 cube empty_cube_cross(void) {

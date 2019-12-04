@@ -136,8 +136,11 @@ void check_packing(cube c, int8_t last_move)
     __uint128_t packed = pack_ce(&c, last_move);
     unpack_ce(&other_c, &unpacked_last_move, packed);
 
-    if (cube_compare(&c, &other_c)) {
+
+    if (cube_compare(&c, &other_c) != 0) {
+        link(&other_c, "print"); 
         printf("WRONG pack of cube\n");
+        exit(0);
     }
     else {
         //printf("ok pack\n");
@@ -252,7 +255,8 @@ int reverse_rotation(int rotation_id) {
 
 // We know that cachepleft] is <= element and cache[right] > element
 int find_index_in_cache_level(solver_cube_packed* cache, int left, int right, solver_cube_packed* element) {
-    
+    assert(left >=0);
+    assert(left < right);
     while (left + 1 < right) {
         int middle = (left + right)/2;
         int cmp = solver_cube_compare(cache + middle, element);
@@ -294,7 +298,8 @@ void print_cache_sequence(solver_cube_packed* cache, int current_level_start, in
     expected_parent.packed = pack_ce(&rotato, 0);
     
     int right = current_level_start -1;
-    int left = (int)  cache[right].packed;
+    int left = (int) cache[right].packed;
+    assert(left >= 0);
     int index = find_index_in_cache_level(cache, left, right, &expected_parent);
 
     assert(direction == 1 || direction == -1);
@@ -369,8 +374,9 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size){
     int level_cc = 0;
 
     for (int i=0; i<levels; i++) {
-        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache);
+        
         cache_c[level_end_c].packed = level_start_c;
+        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache);
 
         level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
@@ -379,8 +385,8 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size){
 
         find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc);
 
-        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache);
         cache_cc[level_end_cc].packed = level_start_cc;
+        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache);
         level_start_cc = level_end_cc + 1;
         level_end_cc = new_level_end;
         level_cc++;
@@ -469,28 +475,32 @@ int main(void) {
             attempted_position = starting_position; 
         }
         else if (!strcmp(buffer,"init_slot_1")) { 
+            printf("Init slot 1\n");
             starting_position = init_slot(starting_position, 1);
             attempted_position = starting_position; 
         }
         else if (!strcmp(buffer,"init_slot_2")) { 
+            printf("Init slot 2\n");
             starting_position = init_slot(starting_position, 2);
             attempted_position = starting_position; 
         }
         else if (!strcmp(buffer,"init_slot_3")) { 
+            printf("Init slot 3\n");
             starting_position = init_slot(starting_position, 3);
             attempted_position = starting_position; 
         }
         else if (!strcmp(buffer,"init_slot_4")) { 
+            printf("Init slot 4\n");
             starting_position = init_slot(starting_position, 4);
             attempted_position = starting_position; 
         }        
         else if (!strcmp(buffer,"solve")) { 
             printf("try solve\n");
-            solve(&attempted_position, &starting_position, 9, cache_size);
+            solve(&attempted_position, &starting_position, 11, cache_size);
          }
          else if (!strcmp(buffer,"reconstruct")) { 
             printf("try reconstruct\n");
-            solve(&starting_position, &attempted_position, 9, cache_size);
+            solve(&starting_position, &attempted_position, 11, cache_size);
          }
          else {
              printf("Unknown command %s\n", buffer);
