@@ -81,8 +81,11 @@ x_centers = [4,0,1,3,2,5]
 y_centers = [0,5,2,1,3,4]
 z_centers = [3,1,5,2,4,0]
 
+
 x_centers_reverse = [1,2,4,3,0,5]
 y_centers_reverse = [0,3,2,4,5,1]
+z_centers_reverse = [5,1,3,0,4,2]
+
 
 basic_symmetries = {
     "x" : { "faces" : ["R", "L'", "farR"], "centers" : x_centers},
@@ -91,9 +94,15 @@ basic_symmetries = {
     "M" : { "faces" : ["farR'"], "centers" : x_centers_reverse},
     "E" : { "faces" : ["farU'"], "centers" : y_centers_reverse},
     "S" : { "faces" : ["farF"], "centers" : z_centers},
+    "r" : { "faces" : ["R", "farR"], "centers" : x_centers},
+    "l" : { "faces" : ["L", "farR'"], "centers" : x_centers_reverse},
+    "u" : { "faces" : ["U", "farU"], "centers" : y_centers},
+    "d" : { "faces" : ["D", "farU'"], "centers" : y_centers_reverse},
+    "f" : { "faces" : ["F", "farF"], "centers" : z_centers},
+    "b" : { "faces" : ["B", "farF'"], "centers" : z_centers_reverse},
 }
 
-wide_moves_and_rotations = ["x", "y", "z", "M", "E", "S"]
+wide_moves_and_rotations = ["x", "y", "z", "M", "E", "S", "r", "l", "u", "d", "f", "b"]
 
 def expand(sequence):
     result = []

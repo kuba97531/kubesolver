@@ -37,7 +37,25 @@ cube E_3(cube *other);
 cube S_1(cube *other);
 cube S_2(cube *other);
 cube S_3(cube *other);
-#define ALL_ROTATION_LEN 36
+cube r_1(cube *other);
+cube r_2(cube *other);
+cube r_3(cube *other);
+cube l_1(cube *other);
+cube l_2(cube *other);
+cube l_3(cube *other);
+cube u_1(cube *other);
+cube u_2(cube *other);
+cube u_3(cube *other);
+cube d_1(cube *other);
+cube d_2(cube *other);
+cube d_3(cube *other);
+cube f_1(cube *other);
+cube f_2(cube *other);
+cube f_3(cube *other);
+cube b_1(cube *other);
+cube b_2(cube *other);
+cube b_3(cube *other);
+#define ALL_ROTATION_LEN 54
 
 extern t_rotation all_rotations[];
 extern char* all_rotations_s[];
