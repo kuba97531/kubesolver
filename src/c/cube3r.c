@@ -2505,3 +2505,4 @@ char* all_rotations_s[] = {
 "b2",
 "b'"
 };
+const char rotation_families[] = "RRRUUUFFFRRRUUUFFFxxxyyyzzzRRRUUUFFFRRRRRRUUUUUUFFFFFF";

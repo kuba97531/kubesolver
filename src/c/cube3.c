@@ -186,7 +186,7 @@ cube add_missing_edges(cube c) {
 cube add_f2l(cube c) {
     cube cc = c;
     cc = add_cross(cc);
-    for (int i=0; i<4; i++) {
+    for (int i=1; i<=4; i++) {
         cc = add_slot(cc, i);
     }
     return cc;

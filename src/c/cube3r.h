@@ -59,5 +59,6 @@ cube b_3(cube *other);
 
 extern t_rotation all_rotations[];
 extern char* all_rotations_s[];
+extern const char rotation_families[];
 
 #endif

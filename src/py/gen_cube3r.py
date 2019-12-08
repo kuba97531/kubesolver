@@ -104,6 +104,12 @@ basic_symmetries = {
 
 wide_moves_and_rotations = ["x", "y", "z", "M", "E", "S", "r", "l", "u", "d", "f", "b"]
 
+families = [ "RLrlM", "FBfbS", "UDudE", "x", "y", "z" ]
+family_dict = {}
+for family in families:
+    for ch in family:
+        family_dict[ch] = family[0]
+
 def expand(sequence):
     result = []
     for s in sequence:
@@ -151,7 +157,8 @@ if __name__ == "__main__":
 
             all_rotations = []
             all_rotations_s = []
-            
+            all_families = []
+
             fh.write("#include \"cube3.h\"\n")
             fh.write("#ifndef CUBE3_R\n")
             fh.write("#define CUBE3_R\n")
@@ -165,6 +172,9 @@ if __name__ == "__main__":
                 all_rotations_s.append(name)
                 all_rotations_s.append(name+"2")
                 all_rotations_s.append(name+"'")
+                all_families.append(family_dict[name])
+                all_families.append(family_dict[name])
+                all_families.append(family_dict[name])
 
             for name in turn_faces:
                 d = faces[name]
@@ -184,6 +194,7 @@ if __name__ == "__main__":
             fh.write("#define ALL_ROTATION_LEN {}\n\n".format(len(all_rotations_s)) )
             fh.write("extern t_rotation all_rotations[];\n")
             fh.write("extern char* all_rotations_s[];\n")
+            fh.write("extern const char rotation_families[];\n")
 
             fc.write("t_rotation all_rotations[] = {\n")
             fc.write(",\n".join(all_rotations))
@@ -192,4 +203,9 @@ if __name__ == "__main__":
             fc.write("char* all_rotations_s[] = {\n\"")
             fc.write("\",\n\"".join(all_rotations_s))
             fc.write("\"\n};\n")
+
+            fc.write("const char rotation_families[] = \"")
+            fc.write("".join(all_families))
+            fc.write("\";\n")
+
             fh.write("\n#endif\n")

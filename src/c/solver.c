@@ -181,18 +181,13 @@ void sort_cubes(solver_cube_packed* arr, int from, int to, solver_cube_packed* m
 }
 
 
-//ruf ldb
+// e.g. R and R'
 int is_sister_rotation(int r1, int r2) {
     return r1 / 3 == r2 / 3;
 }
 
-int is_far_sister(int r1, int r2) {
-    r1 /= 3;
-    r2 /= 3;
-    if ( r1 == 0 && r2 == 3) return 1;
-    if ( r1 == 1 && r2 == 4) return 1;
-    if ( r1 == 2 && r2 == 5) return 1;
-    return 0;
+int is_forbidden_sequence(int r1, int r2) {
+    return rotation_families[r1] == rotation_families[r2] && r1 > r2;
 }
 
 // Returns the number of lat unique element
@@ -219,7 +214,7 @@ int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_
 
         for (int i=0; i<legal_rotations_len; i++)  {
             int rotation = legal_rotations[i];
-            if (c > 0 && ( is_sister_rotation(rotation, current_rotation)  || is_far_sister(rotation, current_rotation) ))
+            if (c > 0 && ( is_sister_rotation(rotation, current_rotation)  || is_forbidden_sequence(rotation, current_rotation) ))
             {
                 continue;
             }
@@ -397,6 +392,7 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size){
 
 void set_3gen(char* chs)
 {
+    //TODO: add option to use only double rotation for some move
     legal_rotations_len = 0;
     for (int i=0; i<ALL_ROTATION_LEN; i++)
     {
