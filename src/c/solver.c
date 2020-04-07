@@ -9,6 +9,7 @@
 #include "cube3.h"
 #include "cube3r.h"
 #include "cube_compression.h"
+#include "util.h"
 
 typedef struct 
 {
@@ -416,27 +417,18 @@ void set_all_rotations(void) {
 }
 
 int main(void) {
+    printf("INFO: cubesolver 1.0\n");
+
+    uint64_t cache_size = portable_available_memory();
+    cache_size /= sizeof(solver_cube_packed);
+    printf("INFO: Allowing cache size of %u positions\n", (uint32_t)cache_size);
+
     set_all_rotations();
 
     cube starting_position = empty_cube();
     cube attempted_position = empty_cube();
 
-    int cache_size_in_MB;
-    uint64_t cache_size;
-    int scanf_result = scanf("%d", &cache_size_in_MB);
-    if (scanf_result == 0) {
-        printf("scanf error\n");
-        exit(1);
-    }
-
     char buffer[100];
-    scanf_result= scanf("%s", buffer);
-    set_3gen(buffer);
-    printf("Using generator: %s\n", buffer);
-
-    cache_size = cache_size_in_MB * (uint64_t)(1024 * 1024);
-    cache_size /= sizeof(solver_cube_packed);
-    printf("Allowing cache size of %u positions\n", (uint32_t)cache_size);
 
     while (scanf("%s", buffer) != EOF) {
         //apply rotation
@@ -453,7 +445,15 @@ int main(void) {
              link(&attempted_position, "print"); 
              check_packing(attempted_position, 17);
              printf("\n");
-              }
+             }
+        else if (!strcmp(buffer,"set_gen")) { 
+            int scan_result = scanf(" %s", buffer);
+            if (scan_result == 0) {
+                printf("missing argument to set_gen\n");
+                exit(1);
+            }
+            set_3gen(buffer);
+        }
         else if (!strcmp(buffer,"init_full_cube")) { 
             attempted_position = starting_position = full_cube();
         }

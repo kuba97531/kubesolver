@@ -80,7 +80,8 @@ LINKER=\
 SRC_FILES = \
  cube3.c\
  cube3r.c\
- cube_compression.c
+ cube_compression.c\
+ util.c
 
 SRC_ALWAYS_REBUILD_FILES = \
  solver.c
