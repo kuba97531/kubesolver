@@ -151,6 +151,102 @@ def write_symmetry_function(fc, fh, name, applied_symmetries):
 
     fc.write("\n")
 
+
+def write_edges_and_corner_names(fc, fh):
+    faces_order = ["D", "U", "F", "B", "R", "L"]
+    edges_sticker_names = [] 
+    edges_sticker_indices = [] 
+
+    corner_sticker_names = [] 
+    corner_sticker_indices = [] 
+
+    def get_all_edges_names():
+        edges = []
+        for first in range(6):
+            f = faces_order[first]
+            for second in range(first + 1, 6):
+                s = faces_order[second]
+                edges.append((f, s))
+        return edges
+
+    def get_all_corner_names():
+        edges = []
+        for first in range(6):
+            f = faces_order[first]
+            for second in range(first + 1, 6):
+                s = faces_order[second]
+                for third in range(second + 1, 6):
+                    t = faces_order[third]
+                    edges.append((f, s, t))
+        return edges
+
+    def find_index_for_edge_sticker(f, s):
+        first_face = faces[f]['e']
+        second_face = faces[s]['e']
+        for i in range(24):
+            if i in first_face[0] and i in second_face[1]:
+                return i
+        return -1
+
+    def find_index_for_corner_sticker(f, s, t):
+        first_face = faces[f]['c']
+        second_face = faces[s]['c']
+        third_face = faces[t]['c']
+        for i in range(24):
+            if i in first_face[0]:
+                if i in second_face[1] or i in second_face[2]:
+                    if i in third_face[1] or i in third_face[2]:
+                        return i
+        return -1
+
+    for f, s in get_all_edges_names():
+        i1 = find_index_for_edge_sticker(f, s)
+        i2 = find_index_for_edge_sticker(s, f)
+        if i1 != -1 and i2 != -1:
+            edges_sticker_names.append("{\"%s%s\", \"%s%s\"}" % (f,s, s, f))
+            edges_sticker_indices.append("{%s, %s}" % (i1, i2))
+
+            
+    for f, s, t in get_all_corner_names():
+        i1 = find_index_for_corner_sticker(f, s, t)
+        i2 = find_index_for_corner_sticker(s, f, t)
+        i3 = find_index_for_corner_sticker(t, s, f)
+        
+        if i1 != -1 and i2 != -1 and i3 != -1:
+            names = (f,s,t,  f,t,s,  s,f,t,  s,t,f,  t,f,s,  t,s,f)
+            pattern = ", ".join(["\"%s%s%s\""] * 6)
+            pattern = "{%s}" % pattern
+            corner_sticker_names.append( pattern % names)
+            corner_sticker_indices.append("{%s, %s, %s}" % (i1, i2, i3))
+
+    result = []     
+    result.append("")   
+    result.append("int edges_by_name_indexes[%d][2] = {" % len(edges_sticker_names))
+    result.append(", ".join(edges_sticker_indices))
+    result.append("};")
+    result.append("")   
+    result.append("char* edges_by_names[%d][2] = {" % len(edges_sticker_names))
+    result.append(", ".join(edges_sticker_names))
+    result.append("};")
+    result.append("")   
+    result.append("int corners_by_name_indexes[%d][3] = {" % len(corner_sticker_names))
+    result.append(", ".join(corner_sticker_indices))
+    result.append("};")
+    result.append("")   
+    result.append("char* corners_by_names[%d][6] = {" % len(corner_sticker_names))
+    result.append(", ".join(corner_sticker_names))
+    result.append("};")
+
+    for line in result:
+        fc.write(line)
+        fc.write("\n")
+
+    fh.write("extern int edges_by_name_indexes[%d][2];\n" % len(edges_sticker_names))
+    fh.write("extern char* edges_by_names[%d][2];\n" % len(edges_sticker_names))
+    fh.write("extern int corners_by_name_indexes[%d][3];\n" % len(corner_sticker_names))
+    fh.write("extern char* corners_by_names[%d][6];\n" % len(corner_sticker_names))
+
+
 if __name__ == "__main__":
     with open(r'src/c/cube3r.c', "w") as fc:
         with open(r'src/c/cube3r.h', "w") as fh:
@@ -207,5 +303,7 @@ if __name__ == "__main__":
             fc.write("const char rotation_families[] = \"")
             fc.write("".join(all_families))
             fc.write("\";\n")
+
+            write_edges_and_corner_names(fc, fh)
 
             fh.write("\n#endif\n")

@@ -60,5 +60,9 @@ cube b_3(cube *other);
 extern t_rotation all_rotations[];
 extern char* all_rotations_s[];
 extern const char rotation_families[];
+extern int edges_by_name_indexes[12][2];
+extern char* edges_by_names[12][2];
+extern int corners_by_name_indexes[8][3];
+extern char* corners_by_names[8][6];
 
 #endif

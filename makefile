@@ -80,6 +80,7 @@ LINKER=\
 SRC_FILES = \
  cube3.c\
  cube3r.c\
+ cube_initialization.c\
  cube_compression.c\
  util.c
 

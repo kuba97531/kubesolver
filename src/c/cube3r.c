@@ -2506,3 +2506,19 @@ char* all_rotations_s[] = {
 "b'"
 };
 const char rotation_families[] = "RRRUUUFFFRRRUUUFFFxxxyyyzzzRRRUUUFFFRRRRRRUUUUUUFFFFFF";
+
+int edges_by_name_indexes[12][2] = {
+{8, 6}, {10, 18}, {9, 14}, {11, 22}, {2, 4}, {0, 16}, {1, 12}, {3, 20}, {5, 15}, {7, 21}, {19, 13}, {17, 23}
+};
+
+char* edges_by_names[12][2] = {
+{"DF", "FD"}, {"DB", "BD"}, {"DR", "RD"}, {"DL", "LD"}, {"UF", "FU"}, {"UB", "BU"}, {"UR", "RU"}, {"UL", "LU"}, {"FR", "RF"}, {"FL", "LF"}, {"BR", "RB"}, {"BL", "LB"}
+};
+
+int corners_by_name_indexes[8][3] = {
+{9, 7, 14}, {8, 6, 23}, {11, 18, 15}, {10, 19, 22}, {3, 5, 12}, {2, 4, 21}, {1, 16, 13}, {0, 17, 20}
+};
+
+char* corners_by_names[8][6] = {
+{"DFR", "DRF", "FDR", "FRD", "RDF", "RFD"}, {"DFL", "DLF", "FDL", "FLD", "LDF", "LFD"}, {"DBR", "DRB", "BDR", "BRD", "RDB", "RBD"}, {"DBL", "DLB", "BDL", "BLD", "LDB", "LBD"}, {"UFR", "URF", "FUR", "FRU", "RUF", "RFU"}, {"UFL", "ULF", "FUL", "FLU", "LUF", "LFU"}, {"UBR", "URB", "BUR", "BRU", "RUB", "RBU"}, {"UBL", "ULB", "BUL", "BLU", "LUB", "LBU"}
+};

@@ -9,6 +9,7 @@
 #include "cube3.h"
 #include "cube3r.h"
 #include "cube_compression.h"
+#include "cube_initialization.h"
 #include "util.h"
 
 typedef struct 
@@ -460,6 +461,24 @@ int main(void) {
         else if (!strcmp(buffer,"init_empty_cube")) { 
             attempted_position = starting_position = empty_cube();
         }
+        else if (!strcmp(buffer,"add_edge")) { 
+            int scan_result = scanf(" %s", buffer);
+
+            if (scan_result == 0) {
+                printf("missing argument to add_edge\n");
+                exit(1);
+            }
+            starting_position = attempted_position = add_edge(starting_position, buffer);
+        }
+        else if (!strcmp(buffer,"add_corner")) { 
+            int scan_result = scanf(" %s", buffer);
+
+            if (scan_result == 0) {
+                printf("missing argument to add_corner\n");
+                exit(1);
+            }
+            starting_position = attempted_position = add_corner(starting_position, buffer);
+        }
         else if (!strcmp(buffer,"add_corner_orientation")) { 
             starting_position = attempted_position = add_missing_corner_orientation(starting_position);
         }
@@ -472,36 +491,36 @@ int main(void) {
         else if (!strcmp(buffer,"add_edges")) { 
             starting_position = attempted_position = add_missing_edges(starting_position);
         }
-        else if (!strcmp(buffer,"add_f2l")) { 
-            starting_position = attempted_position = add_f2l(starting_position);
-        }
-        else if (!strcmp(buffer,"add_cross")) { 
-            starting_position = attempted_position = add_cross(starting_position);
-        }
-        else if (!strcmp(buffer,"add_cross_piece_f")) { 
-            starting_position = attempted_position = add_cross_piece(starting_position, 0);
-        }
-        else if (!strcmp(buffer,"add_cross_piece_r")) { 
-            starting_position = attempted_position = add_cross_piece(starting_position, 1);
-        }
-        else if (!strcmp(buffer,"add_cross_piece_b")) { 
-            starting_position = attempted_position = add_cross_piece(starting_position, 2);
-        }
-        else if (!strcmp(buffer,"add_cross_piece_l")) { 
-            starting_position = attempted_position = add_cross_piece(starting_position, 3);
-        }
-        else if (!strcmp(buffer,"add_slot_fr")) { 
-            starting_position = attempted_position = add_slot(starting_position, 1);
-        }
-        else if (!strcmp(buffer,"add_slot_fl")) { 
-            starting_position = attempted_position = add_slot(starting_position, 2);
-        }
-        else if (!strcmp(buffer,"add_slot_br")) { 
-            starting_position = attempted_position = add_slot(starting_position, 3);
-        }
-        else if (!strcmp(buffer,"add_slot_bl")) { 
-            starting_position = attempted_position = add_slot(starting_position, 4);
-        }
+        // else if (!strcmp(buffer,"add_f2l")) { 
+        //     starting_position = attempted_position = add_f2l(starting_position);
+        // }
+        // else if (!strcmp(buffer,"add_cross")) { 
+        //     starting_position = attempted_position = add_cross(starting_position);
+        // }
+        // else if (!strcmp(buffer,"add_cross_piece_f")) { 
+        //     starting_position = attempted_position = add_cross_piece(starting_position, 0);
+        // }
+        // else if (!strcmp(buffer,"add_cross_piece_r")) { 
+        //     starting_position = attempted_position = add_cross_piece(starting_position, 1);
+        // }
+        // else if (!strcmp(buffer,"add_cross_piece_b")) { 
+        //     starting_position = attempted_position = add_cross_piece(starting_position, 2);
+        // }
+        // else if (!strcmp(buffer,"add_cross_piece_l")) { 
+        //     starting_position = attempted_position = add_cross_piece(starting_position, 3);
+        // }
+        // else if (!strcmp(buffer,"add_slot_fr")) { 
+        //     starting_position = attempted_position = add_slot(starting_position, 1);
+        // }
+        // else if (!strcmp(buffer,"add_slot_fl")) { 
+        //     starting_position = attempted_position = add_slot(starting_position, 2);
+        // }
+        // else if (!strcmp(buffer,"add_slot_br")) { 
+        //     starting_position = attempted_position = add_slot(starting_position, 3);
+        // }
+        // else if (!strcmp(buffer,"add_slot_bl")) { 
+        //     starting_position = attempted_position = add_slot(starting_position, 4);
+        // }
         else if (!strcmp(buffer,"solve")) { 
             printf("try solve\n");
             solve(&attempted_position, &starting_position, 11, cache_size);
