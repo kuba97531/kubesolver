@@ -7,6 +7,9 @@ void disable_info_messages(void) {
 }
 void info(char* format, ...)
 {
+    if (!print_info) {
+        return;
+    }
    printf("INFO:");
    va_list arglist;
    va_start( arglist, format );

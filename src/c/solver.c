@@ -428,7 +428,7 @@ void set_all_rotations(void) {
     }
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
     info("Cubesolver 1.0 (C) Jakub Straszewski 2020\n");
 
     uint64_t cache_size = portable_available_memory();
@@ -445,6 +445,17 @@ int main(void) {
 
     int applied_rotations[10000];
     int applied_rotations_n = 0;
+
+    for (int i=0; i< argc; i++) {
+        char* arg = argv[i];
+        if (!strcmp(arg,"--silent")) {
+            disable_info_messages();
+        }
+        if (!strcmp(arg,"--exit_on_find")) {
+            exit_on_find = 1;
+        }
+    }
+
 
     while (scanf("%s", buffer) != EOF) {
         //apply rotation
