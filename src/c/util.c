@@ -5,6 +5,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <ctype.h>
+#include <stdint.h>
 
 #else
 #define MEMINFO_FILE "/proc/meminfo"
