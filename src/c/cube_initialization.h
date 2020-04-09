@@ -2,7 +2,13 @@
 #ifndef CUBE_INITIALIZATION
 
 
+/**
+ * Adds stickers to a particular edge described as two upcase letters. e.g. LB
+ */
 cube add_edge(cube c, char* edge_name);
+/**
+ * Adds stickers to a particular corner described as three upcase letters. e.g. RFU
+ */
 cube add_corner(cube c, char* corner_name);
 /**
  * Adds corner orientation stickers to corners which aren't stickered yet.

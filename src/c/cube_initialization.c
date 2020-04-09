@@ -3,6 +3,7 @@
 #include "cube3r.h"
 #include "cube_initialization.h"
 
+//TODO: change this to 0, 7, 7
 int oll_corners_colors[3] = {
     3/4, 12/4, 5/4
 };

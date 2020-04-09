@@ -686,6 +686,30 @@ int main(int argc, char* argv[]) {
         else if (!strcmp(buffer,"set_domino_cube")) { 
             starting_position = attempted_position = add_domino_elements(empty_cube());
         }
+        else if (!strcmp(buffer,"add_f2l")) { 
+            cube c = starting_position;
+            c = add_corner(c, "DFR");
+            c = add_corner(c, "DFL");
+            c = add_corner(c, "DBR");
+            c = add_corner(c, "DBL");
+            c = add_edge(c, "DF");
+            c = add_edge(c, "DL");
+            c = add_edge(c, "DR");
+            c = add_edge(c, "DB");
+            c = add_edge(c, "FR");
+            c = add_edge(c, "FL");
+            c = add_edge(c, "BR");
+            c = add_edge(c, "BL");
+            starting_position = attempted_position = c;
+        }
+        else if (!strcmp(buffer,"add_cross")) { 
+            cube c = starting_position;
+            c = add_edge(c, "DF");
+            c = add_edge(c, "DL");
+            c = add_edge(c, "DR");
+            c = add_edge(c, "DB");
+            starting_position = attempted_position = c;
+        }
         else if (!strcmp(buffer,"solve")) { 
             solve(&attempted_position, &starting_position, 11, cache_size, exit_on_find);
          }
