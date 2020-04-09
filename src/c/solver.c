@@ -11,6 +11,7 @@
 #include "cube_compression.h"
 #include "cube_initialization.h"
 #include "util.h"
+#include "solver_io.h"
 
 typedef struct 
 {
@@ -221,7 +222,7 @@ int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_
                 continue;
             }
             if (new_level_end >= max_cache_size) {
-                printf("Memory limit exceeded. Terminating\n");
+                info("Memory limit exceeded. Terminating\n");
                 exit(-1);
                 return -1;
             }
@@ -310,7 +311,7 @@ void print_cache_sequence(solver_cube_packed* cache, int current_level_start, in
     }
 }
 
-void find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt) {
+int find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt, int exit_on_find) {
     int c_level_start = f;
     int cc_level_start = ff;
     while (f < t && ff < tt) {
@@ -327,6 +328,9 @@ void find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, 
             fflush(stdout);
             f++;
             ff++;
+            if (exit_on_find) {
+                return 1;
+            }
         }
         else  if (cmp < 0)
         {
@@ -336,9 +340,10 @@ void find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, 
             ff++;
         }
     }
+    return 0;
 }
 
-void solve(cube* c, cube* cc, int levels, uint64_t cache_size){
+void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find){
     solver_cube_packed* cache_c;
     solver_cube_packed* cache_cc;
     solver_cube_packed* mergesort_cache;
@@ -349,12 +354,12 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size){
     cache_cc = malloc(cache_size  * sizeof(solver_cube_packed));
     mergesort_cache = malloc(cache_size  * sizeof(solver_cube_packed));
     if (cache_c == NULL || cache_cc == NULL) {
-        printf("not enough memory\n");
+        printf("ERROR: not enough memory\n");
         exit(0);
     }
 
     if (mergesort_cache == NULL) {
-        printf("Failed to allocate enough memory for extra cache - using qsort instead of mergesort\n");
+        info("Failed to allocate enough memory for extra cache - using qsort instead of mergesort\n");
     }
 
     cache_c[0].packed = pack_ce(c, 0);
@@ -378,17 +383,23 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size){
         level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
         level_c++;
-        printf("Searching %d move solutions...\n", level_c + level_cc );
+        info("Searching %d move solutions...", level_c + level_cc );
 
-        find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc);
+        int should_exit = find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find);
+        if (should_exit) {
+            return;
+        }
 
         cache_cc[level_end_cc].packed = level_start_cc;
         new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache);
         level_start_cc = level_end_cc + 1;
         level_end_cc = new_level_end;
         level_cc++;
-        printf("Searching %d move solutions...\n", level_c + level_cc );
-        find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc);
+        info("Searching %d move solutions...", level_c + level_cc );
+        should_exit = find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find);
+        if (should_exit) {
+            return;
+        }
     }
 }
 
@@ -418,18 +429,22 @@ void set_all_rotations(void) {
 }
 
 int main(void) {
-    printf("INFO: cubesolver 1.0\n");
+    info("Cubesolver 1.0 (C) Jakub Straszewski 2020\n");
 
     uint64_t cache_size = portable_available_memory();
     cache_size /= sizeof(solver_cube_packed);
-    printf("INFO: Allowing cache size of %u positions\n", (uint32_t)cache_size);
+    info("Allowing cache size of %u positions", (uint32_t)cache_size);
 
     set_all_rotations();
 
-    cube starting_position = empty_cube();
-    cube attempted_position = empty_cube();
+    cube starting_position = full_cube();
+    cube attempted_position = full_cube();
 
     char buffer[100];
+    int exit_on_find = 0;
+
+    int applied_rotations[10000];
+    int applied_rotations_n = 0;
 
     while (scanf("%s", buffer) != EOF) {
         //apply rotation
@@ -437,12 +452,28 @@ int main(void) {
         for (int i=0; i<ALL_ROTATION_LEN ; i++) {
             if (!strcmp(buffer,all_rotations_s[i])) {
                 attempted_position = all_rotations[i](&attempted_position);
+                applied_rotations[applied_rotations_n++] = i;
                 found = 1;
                 break;
             }
         }
         if (found) continue;
-        if (!strcmp(buffer,"print")) { 
+        if (!strcmp(buffer,"calculate_repetitions")) {
+            cube position = starting_position;
+            int n = 0;
+            while (n == 0 || cube_compare(&position, &starting_position)) {
+                n++;
+                for (int i=0; i< applied_rotations_n; i++) {
+                    position = all_rotations[applied_rotations[i]](&position);
+                }
+                link(&position, "print"); 
+
+            }
+            link(&position, "position"); 
+            link(&starting_position, "starting position"); 
+            info("Requires %d moves to repeat", n);
+        }
+        else if (!strcmp(buffer,"print")) { 
              link(&attempted_position, "print"); 
              check_packing(attempted_position, 17);
              printf("\n");
@@ -450,22 +481,27 @@ int main(void) {
         else if (!strcmp(buffer,"set_gen")) { 
             int scan_result = scanf(" %s", buffer);
             if (scan_result == 0) {
-                printf("missing argument to set_gen\n");
+                printf("ERROR: missing argument to set_gen\n");
                 exit(1);
             }
             set_3gen(buffer);
+              }
+        else if (!strcmp(buffer,"exit_on_find")) { 
+            exit_on_find = 1;
         }
         else if (!strcmp(buffer,"init_full_cube")) { 
             attempted_position = starting_position = full_cube();
+            applied_rotations_n = 0;
         }
         else if (!strcmp(buffer,"init_empty_cube")) { 
             attempted_position = starting_position = empty_cube();
+            applied_rotations_n = 0;
         }
         else if (!strcmp(buffer,"add_edge")) { 
             int scan_result = scanf(" %s", buffer);
 
             if (scan_result == 0) {
-                printf("missing argument to add_edge\n");
+                printf("ERROR: missing argument to add_edge\n");
                 exit(1);
             }
             starting_position = attempted_position = add_edge(starting_position, buffer);
@@ -474,7 +510,7 @@ int main(void) {
             int scan_result = scanf(" %s", buffer);
 
             if (scan_result == 0) {
-                printf("missing argument to add_corner\n");
+                printf("ERROR: missing argument to add_corner\n");
                 exit(1);
             }
             starting_position = attempted_position = add_corner(starting_position, buffer);
@@ -491,43 +527,13 @@ int main(void) {
         else if (!strcmp(buffer,"add_edges")) { 
             starting_position = attempted_position = add_missing_edges(starting_position);
         }
-        // else if (!strcmp(buffer,"add_f2l")) { 
-        //     starting_position = attempted_position = add_f2l(starting_position);
-        // }
-        // else if (!strcmp(buffer,"add_cross")) { 
-        //     starting_position = attempted_position = add_cross(starting_position);
-        // }
-        // else if (!strcmp(buffer,"add_cross_piece_f")) { 
-        //     starting_position = attempted_position = add_cross_piece(starting_position, 0);
-        // }
-        // else if (!strcmp(buffer,"add_cross_piece_r")) { 
-        //     starting_position = attempted_position = add_cross_piece(starting_position, 1);
-        // }
-        // else if (!strcmp(buffer,"add_cross_piece_b")) { 
-        //     starting_position = attempted_position = add_cross_piece(starting_position, 2);
-        // }
-        // else if (!strcmp(buffer,"add_cross_piece_l")) { 
-        //     starting_position = attempted_position = add_cross_piece(starting_position, 3);
-        // }
-        // else if (!strcmp(buffer,"add_slot_fr")) { 
-        //     starting_position = attempted_position = add_slot(starting_position, 1);
-        // }
-        // else if (!strcmp(buffer,"add_slot_fl")) { 
-        //     starting_position = attempted_position = add_slot(starting_position, 2);
-        // }
-        // else if (!strcmp(buffer,"add_slot_br")) { 
-        //     starting_position = attempted_position = add_slot(starting_position, 3);
-        // }
-        // else if (!strcmp(buffer,"add_slot_bl")) { 
-        //     starting_position = attempted_position = add_slot(starting_position, 4);
-        // }
         else if (!strcmp(buffer,"solve")) { 
-            printf("try solve\n");
-            solve(&attempted_position, &starting_position, 11, cache_size);
+            info("try solve");
+            solve(&attempted_position, &starting_position, 11, cache_size, exit_on_find);
          }
          else if (!strcmp(buffer,"reconstruct")) { 
-            printf("try reconstruct\n");
-            solve(&starting_position, &attempted_position, 11, cache_size);
+            info("try reconstruct");
+            solve(&starting_position, &attempted_position, 11, cache_size, exit_on_find);
          }
          else {
              printf("ERROR: Unknown command %s\n", buffer);
