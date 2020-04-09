@@ -189,8 +189,19 @@ int is_sister_rotation(int r1, int r2) {
     return r1 / 3 == r2 / 3;
 }
 
-int is_forbidden_sequence(int r1, int r2) {
-    return rotation_families[r1] == rotation_families[r2] && r1 > r2;
+int is_forbidden_pair(int r1, int r2, int direction) {
+    if (is_sister_rotation(r1, r2)) {
+        return 1;
+    }
+    if (rotation_families[r1] == rotation_families[r2]) {
+        if (direction == 1) {
+            return r1 > r2;
+        }
+        else {
+            return r1 < r2;
+        }
+    }
+    return 0;
 }
 
 // Returns the number of lat unique element
@@ -207,7 +218,7 @@ int remove_duplicates(solver_cube_packed* arr, int from, int to) {
 int legal_rotations[24];
 int legal_rotations_len = 0;
 
-int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_start, int level_end, int new_level_start, solver_cube_packed* mergesort_temp) {
+int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_start, int level_end, int new_level_start, solver_cube_packed* mergesort_temp, int direction) {
     int new_level_end = new_level_start;
     for (int c = level_start; c < level_end; c++) {
         solver_cube_unpacked current_unpacked;
@@ -217,7 +228,7 @@ int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_
 
         for (int i=0; i<legal_rotations_len; i++)  {
             int rotation = legal_rotations[i];
-            if (c > 0 && ( is_sister_rotation(rotation, current_rotation)  || is_forbidden_sequence(rotation, current_rotation) ))
+            if (c > 0 && is_forbidden_pair(rotation, current_rotation, direction))
             {
                 continue;
             }
@@ -283,7 +294,9 @@ int find_index_in_cache_level(solver_cube_packed* cache, int left, int right, so
     exit(0);
 }
 
-void print_cache_sequence(solver_cube_packed* cache, int current_level_start, int original_item, int direction) {
+
+
+void find_cache_sequence(int* out_sequence_len, int* out_sequence, solver_cube_packed* cache, int current_level_start, int original_item) {
     if (original_item == 0 ) return;
       
     cube current_cube;
@@ -299,16 +312,33 @@ void print_cache_sequence(solver_cube_packed* cache, int current_level_start, in
     int left = (int) cache[right].packed;
     assert(left >= 0);
     int index = find_index_in_cache_level(cache, left, right, &expected_parent);
+    find_cache_sequence(out_sequence_len, out_sequence, cache, left, index);
+    out_sequence[*out_sequence_len] = last_move;
+    (*out_sequence_len)++;
+}
 
-    assert(direction == 1 || direction == -1);
-    if (direction == 1) {
-        print_cache_sequence(cache, left, index, 1);
+void print_sequence(int sequence_len, int sequence[]) {
+    for (int i=0; i<sequence_len; i++) {
+        int last_move = sequence[i];
         printf("%s ", all_rotations_s[last_move]);
     }
-    else {
-        printf("%s ", all_rotations_s[reverse_rotation(last_move)]);
-        print_cache_sequence(cache, left, index, -1);
+}
+
+void reverse_and_merge_into_first(int sequence_len, int sequence[], int rev_seq_len, int rev_seq[]) {
+    for (int i= 0; i<rev_seq_len; i++) {
+        int last_move = reverse_rotation(rev_seq[rev_seq_len - i - 1]);
+        sequence[i + sequence_len] = last_move;
     }
+}
+
+int is_forbidden_sequence(int sequence_len, int sequence[], int direction) {
+    for (int i=1; i<sequence_len; i++) {
+        if (is_forbidden_pair(sequence[i], sequence[i-1], direction)) 
+        {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt, int exit_on_find) {
@@ -316,21 +346,24 @@ int find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, i
     int cc_level_start = ff;
     while (f < t && ff < tt) {
         int cmp = solver_cube_compare(c + f, cc + ff);
-        int8_t cf_last_move, ccff_last_move;
-        cf_last_move  = unpack_last_move(c[f].packed);
-        ccff_last_move  = unpack_last_move(cc[ff].packed);
-
-        if (cmp ==0 && !is_sister_rotation( cf_last_move, ccff_last_move)) {
-            
-            print_cache_sequence(c, c_level_start, f, 1);
-            print_cache_sequence(cc, cc_level_start, ff, -1);
-            printf("\n");
-            fflush(stdout);
+        if (cmp == 0) {
+            int left_count = 0;
+            int left_array[60];
+            find_cache_sequence(&left_count, left_array, c, c_level_start, f);
+            int right_count = 0;
+            int right_array[30];
+            find_cache_sequence(&right_count, right_array, cc, cc_level_start, ff);
+            reverse_and_merge_into_first(left_count, left_array, right_count, right_array);
+            if (!is_forbidden_sequence(left_count + right_count, left_array, 1)) {
+                print_sequence(left_count + right_count, left_array);
+                printf("\n");
+                fflush(stdout);
+                if (exit_on_find) {
+                    return 1;
+                }
+            }
             f++;
             ff++;
-            if (exit_on_find) {
-                return 1;
-            }
         }
         else  if (cmp < 0)
         {
@@ -378,7 +411,7 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
     for (int i=0; i<levels; i++) {
         
         cache_c[level_end_c].packed = level_start_c;
-        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache);
+        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache, 1);
 
         level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
@@ -391,7 +424,7 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         }
 
         cache_cc[level_end_cc].packed = level_start_cc;
-        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache);
+        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache, -1);
         level_start_cc = level_end_cc + 1;
         level_end_cc = new_level_end;
         level_cc++;
