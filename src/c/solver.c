@@ -215,7 +215,7 @@ int remove_duplicates(solver_cube_packed* arr, int from, int to) {
     return last_unique + 1;
 }
 
-int legal_rotations[24];
+int legal_rotations[40];
 int legal_rotations_len = 0;
 
 int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_start, int level_end, int new_level_start, solver_cube_packed* mergesort_temp, int direction) {
@@ -341,7 +341,7 @@ int is_forbidden_sequence(int sequence_len, int sequence[], int direction) {
     return 0;
 }
 
-int find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt, int exit_on_find) {
+int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt, int exit_on_find, int print_sequences) {
     int c_level_start = f;
     int cc_level_start = ff;
     while (f < t && ff < tt) {
@@ -355,9 +355,18 @@ int find_sequence(solver_cube_packed* c, int f, int t, solver_cube_packed* cc, i
             find_cache_sequence(&right_count, right_array, cc, cc_level_start, ff);
             reverse_and_merge_into_first(left_count, left_array, right_count, right_array);
             if (!is_forbidden_sequence(left_count + right_count, left_array, 1)) {
-                print_sequence(left_count + right_count, left_array);
-                printf("\n");
-                fflush(stdout);
+                if (out_sequence != NULL && out_sequence_len != NULL) {
+                    *out_sequence_len = left_count + right_count;
+                    for (int i=0; i< left_count + right_count;i++) 
+                    { 
+                        out_sequence[i] = left_array[i];
+                    }
+                }
+                if (print_sequences) {
+                    print_sequence(left_count + right_count, left_array);
+                    printf("\n");
+                    fflush(stdout);
+                }
                 if (exit_on_find) {
                     return 1;
                 }
@@ -418,9 +427,9 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         level_c++;
         info("Searching %d move solutions...", level_c + level_cc );
 
-        int should_exit = find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find);
+        int should_exit = find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find, 1);
         if (should_exit) {
-            return;
+            goto SOLVE_FINALLY;
         }
 
         cache_cc[level_end_cc].packed = level_start_cc;
@@ -429,11 +438,16 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         level_end_cc = new_level_end;
         level_cc++;
         info("Searching %d move solutions...", level_c + level_cc );
-        should_exit = find_sequence(cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find);
+        should_exit = find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find, 1);
         if (should_exit) {
-            return;
+            goto SOLVE_FINALLY;
         }
     }
+    SOLVE_FINALLY:
+        free(cache_c);
+        free(cache_cc);
+        if (mergesort_cache != NULL) free(mergesort_cache);
+        return;
 }
 
 void set_3gen(char* chs)
