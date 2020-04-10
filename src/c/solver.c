@@ -575,11 +575,8 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
 
 
 int main(int argc, char* argv[]) {
-    info("Cubesolver 1.0 (C) Jakub Straszewski 2020\n");
-
     uint64_t cache_size = portable_available_memory();
     cache_size /= sizeof(solver_cube_packed);
-    info("Allowing cache size of %u positions", (uint32_t)cache_size);
 
     set_all_rotations();
 
@@ -601,6 +598,8 @@ int main(int argc, char* argv[]) {
             exit_on_find = 1;
         }
     }
+
+    info("KubeSolver 1.0 (C) Jakub Straszewski 2020");
 
     while (scanf("%s", buffer) != EOF) {
         //apply rotation
@@ -671,7 +670,7 @@ int main(int argc, char* argv[]) {
             }
             starting_position = attempted_position = add_corner(starting_position, buffer);
         }
-        else if (!strcmp(buffer,"add_corner_orientation")) { 
+        else if (!strcmp(buffer,"add_corners_orientation")) { 
             starting_position = attempted_position = add_missing_corner_orientation(starting_position);
         }
         else if (!strcmp(buffer,"add_corners")) { 
