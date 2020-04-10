@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "cube3r.h"
+#include "cube_initialization.h"
 
 int oll_corners_colors[3] = {
     3/4, 12/4, 5/4
@@ -88,6 +89,27 @@ cube add_corner(cube c, char* corner_name) {
     }
     return cc;    
 }
+
+cube add_domino_edge(cube c, char* edge_name) {
+    int edge[2];
+    get_edge_stickers_by_name(edge, edge_name);
+    cube cc = c;
+    if (edge[0] != -1) {
+        cc.edges[edge[0]] = 7;
+    }
+    return cc;    
+}
+
+cube add_domino_elements(cube c) {
+    c = add_domino_edge(c, "RF");
+    c = add_domino_edge(c, "LF");
+    c = add_domino_edge(c, "RB");
+    c = add_domino_edge(c, "LB");
+    c = add_missing_edges_orientation(c);
+    c = add_missing_corner_orientation(c);
+    return c;
+}
+
 
 /**
  * Adds corner orientation stickers to corners which aren't stickered yet.

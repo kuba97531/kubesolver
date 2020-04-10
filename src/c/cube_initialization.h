@@ -20,4 +20,6 @@ cube add_missing_edges_orientation(cube c);
  * Adds all stickers to edges.
  */
 cube add_missing_edges(cube c);
+
+cube add_domino_elements(cube c);
 #endif

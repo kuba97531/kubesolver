@@ -438,14 +438,21 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
 
 void set_3gen(char* chs)
 {
-    //TODO: add option to use only double rotation for some move
     legal_rotations_len = 0;
     for (int i=0; i<ALL_ROTATION_LEN; i++)
     {
-        char c = all_rotations_s[i][0];
+        char* c = all_rotations_s[i];
         for (size_t z = 0; z < strlen(chs); z++)
         {
-            if (c == chs[z]) 
+            char s2[] = "_2";
+            if (z < strlen(chs) - 1 && chs[z+1] == '2')
+            {
+                s2[0] = chs[z];
+                if (!strcmp(c, s2)) {
+                    legal_rotations[legal_rotations_len++] = i;
+                }
+            }
+            else if (c[0] == chs[z]) 
             {
                 legal_rotations[legal_rotations_len++] = i;
             }
@@ -570,6 +577,9 @@ int main(int argc, char* argv[]) {
         }
         else if (!strcmp(buffer,"add_edges")) { 
             starting_position = attempted_position = add_missing_edges(starting_position);
+        }
+        else if (!strcmp(buffer,"set_domino_cube")) { 
+            starting_position = attempted_position = add_domino_elements(empty_cube());
         }
         else if (!strcmp(buffer,"solve")) { 
             info("try solve");
