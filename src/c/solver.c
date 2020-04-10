@@ -294,7 +294,37 @@ int find_index_in_cache_level(solver_cube_packed* cache, int left, int right, so
     exit(0);
 }
 
+void set_3gen(char* chs)
+{
+    legal_rotations_len = 0;
+    for (int i=0; i<ALL_ROTATION_LEN; i++)
+    {
+        char* c = all_rotations_s[i];
+        for (size_t z = 0; z < strlen(chs); z++)
+        {
+            char s2[] = "_2";
+            if (z < strlen(chs) - 1 && chs[z+1] == '2')
+            {
+                s2[0] = chs[z];
+                if (!strcmp(c, s2)) {
+                    legal_rotations[legal_rotations_len++] = i;
+                }
+            }
+            else if (c[0] == chs[z]) 
+            {
+                legal_rotations[legal_rotations_len++] = i;
+            }
+        }
+    }
+}
 
+void set_all_rotations(void) {
+    legal_rotations_len = 18;
+    for (int i=0; i<18; i++)
+    {
+        legal_rotations[i] = i;
+    }
+}
 
 void find_cache_sequence(int* out_sequence_len, int* out_sequence, solver_cube_packed* cache, int current_level_start, int original_item) {
     if (original_item == 0 ) return;
@@ -386,7 +416,97 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
             ff++;
         }
     }
-    return 0;
+    return result;
+}
+
+void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube* cc, int levels, uint64_t cache_size) {
+    solver_cube_packed* cache_c;
+    solver_cube_packed* cache_cc;
+    solver_cube_packed* mergesort_cache;
+
+    cache_size /= 3;
+
+    cache_c = malloc(cache_size  * sizeof(solver_cube_packed));
+    cache_cc = malloc(cache_size  * sizeof(solver_cube_packed));
+    mergesort_cache = malloc(cache_size  * sizeof(solver_cube_packed));
+    if (cache_c == NULL || cache_cc == NULL || mergesort_cache == NULL) {
+        printf("ERROR: not enough memory\n");
+        exit(0);
+    }
+    
+    cache_c[0].packed = pack_ce(c, 0);
+    cache_cc[0].packed = pack_ce(cc, 0);
+    
+    int level_start_c = 0;
+    int level_end_c = 1;
+    int level_start_cc = 0;
+    int level_end_cc = 1;
+    int level_c = 0;
+    int level_cc = 0;
+
+    for (int i=0; i<levels; i++) {
+        
+        cache_c[level_end_c].packed = level_start_c;
+        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache, 1);
+
+        level_start_c = level_end_c + 1;
+        level_end_c = new_level_end;
+        level_c++;
+
+        int found = find_sequence(out_sequence, out_sequence_len, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, 1, 0);
+        if (found)  goto SOLVE_PHASE_FINALLY;
+
+        cache_cc[level_end_cc].packed = level_start_cc;
+        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache, -1);
+        level_start_cc = level_end_cc + 1;
+        level_end_cc = new_level_end;
+        level_cc++;
+
+        found = find_sequence(out_sequence, out_sequence_len, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, 1, 0);
+        if (found) goto SOLVE_PHASE_FINALLY;
+    }
+    SOLVE_PHASE_FINALLY:
+        free(cache_c);
+        free(cache_cc);
+        if (mergesort_cache != NULL) free(mergesort_cache);
+        return;
+}
+
+void solve_two_phase(int input_sequence[], int input_sequence_len, int levels, uint64_t cache_size)
+{
+    cube starting_position, attempted_position;
+
+    int phase_solution[80];
+    int phase_count;
+
+    starting_position = attempted_position = add_domino_elements(empty_cube());
+    for (int i=0; i<input_sequence_len; i++) {
+        attempted_position = all_rotations[input_sequence[i]](&attempted_position);
+    }
+    set_3gen("RLFBDU");
+    solve_single_phase(phase_solution, &phase_count, &attempted_position, &starting_position, levels, cache_size);
+    print_sequence(phase_count, phase_solution);
+
+    starting_position = attempted_position = full_cube();
+    for (int i=0; i<input_sequence_len; i++) {
+        attempted_position = all_rotations[input_sequence[i]](&attempted_position);
+    }
+    for (int i=0; i<phase_count; i++) {
+        attempted_position = all_rotations[phase_solution[i]](&attempted_position);
+    }
+    printf("\n");
+    set_3gen("R2L2F2B2DU");
+    solve_single_phase(phase_solution, &phase_count, &attempted_position, &starting_position, levels, cache_size);
+    print_sequence(phase_count, phase_solution);
+    printf("\n");
+
+    // for (int i=0; i<first_phase_count; i++) {
+    //     cc = all_rotations[first_phase[i]](cc);
+    // }
+    // set_3gen("R2L2");
+    // solve_single_phase(phase_solution, &phase_count, c, cc, levels, cache_size);
+    // print_sequence(phase_count, phase_solution);
+
 }
 
 void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find){
@@ -403,7 +523,6 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         printf("ERROR: not enough memory\n");
         exit(0);
     }
-
     if (mergesort_cache == NULL) {
         info("Failed to allocate enough memory for extra cache - using qsort instead of mergesort\n");
     }
@@ -454,37 +573,6 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         return;
 }
 
-void set_3gen(char* chs)
-{
-    legal_rotations_len = 0;
-    for (int i=0; i<ALL_ROTATION_LEN; i++)
-    {
-        char* c = all_rotations_s[i];
-        for (size_t z = 0; z < strlen(chs); z++)
-        {
-            char s2[] = "_2";
-            if (z < strlen(chs) - 1 && chs[z+1] == '2')
-            {
-                s2[0] = chs[z];
-                if (!strcmp(c, s2)) {
-                    legal_rotations[legal_rotations_len++] = i;
-                }
-            }
-            else if (c[0] == chs[z]) 
-            {
-                legal_rotations[legal_rotations_len++] = i;
-            }
-        }
-    }
-}
-
-void set_all_rotations(void) {
-    legal_rotations_len = 18;
-    for (int i=0; i<18; i++)
-    {
-        legal_rotations[i] = i;
-    }
-}
 
 int main(int argc, char* argv[]) {
     info("Cubesolver 1.0 (C) Jakub Straszewski 2020\n");
@@ -513,7 +601,6 @@ int main(int argc, char* argv[]) {
             exit_on_find = 1;
         }
     }
-
 
     while (scanf("%s", buffer) != EOF) {
         //apply rotation
@@ -600,12 +687,13 @@ int main(int argc, char* argv[]) {
             starting_position = attempted_position = add_domino_elements(empty_cube());
         }
         else if (!strcmp(buffer,"solve")) { 
-            info("try solve");
             solve(&attempted_position, &starting_position, 11, cache_size, exit_on_find);
          }
          else if (!strcmp(buffer,"reconstruct")) { 
-            info("try reconstruct");
             solve(&starting_position, &attempted_position, 11, cache_size, exit_on_find);
+         }
+         else if (!strcmp(buffer, "solve_two_phase")) {
+             solve_two_phase(applied_rotations, applied_rotations_n, 11, cache_size);
          }
          else {
              printf("ERROR: Unknown command %s\n", buffer);
