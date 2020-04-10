@@ -344,6 +344,7 @@ int is_forbidden_sequence(int sequence_len, int sequence[], int direction) {
 int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt, int exit_on_find, int print_sequences) {
     int c_level_start = f;
     int cc_level_start = ff;
+    int result = 0;
     while (f < t && ff < tt) {
         int cmp = solver_cube_compare(c + f, cc + ff);
         if (cmp == 0) {
@@ -369,6 +370,9 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
                 }
                 if (exit_on_find) {
                     return 1;
+                }
+                else {
+                    result = 1;
                 }
             }
             f++;
@@ -427,8 +431,8 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         level_c++;
         info("Searching %d move solutions...", level_c + level_cc );
 
-        int should_exit = find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find, 1);
-        if (should_exit) {
+        int found = find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find, 1);
+        if (found && exit_on_find) {
             goto SOLVE_FINALLY;
         }
 
@@ -438,8 +442,8 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         level_end_cc = new_level_end;
         level_cc++;
         info("Searching %d move solutions...", level_c + level_cc );
-        should_exit = find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find, 1);
-        if (should_exit) {
+        found = find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find, 1);
+        if (found && exit_on_find) {
             goto SOLVE_FINALLY;
         }
     }
