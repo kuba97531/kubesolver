@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "cube3r.h"
 #include "cube_initialization.h"
 
@@ -130,6 +131,25 @@ cube add_missing_corner_orientation(cube c) {
     }
     return cc;
 }
+
+cube add_missing_corner_permutation(cube c) {
+    int corner_permutation_index = 0;
+    cube cc = c;
+    for (int i=0; i<24; i+=3) {
+        if (c.corners[corners[i]] == NO_STICKER) {
+            int cpi = corner_permutation_index++;
+            if (cpi >= 6) {
+                printf("ERROR: can't add more than 6 corners permutation due to implementation detail");
+                exit(1);
+            }
+            for (int k=0; k<3; k++) {
+                cc.corners[corners[i + k]] = cpi;
+            }
+        }
+    }
+    return cc;
+}
+
 /**
  * Adds all stickers to all corners.
  */

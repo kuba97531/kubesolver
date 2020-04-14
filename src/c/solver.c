@@ -674,6 +674,9 @@ int main(int argc, char* argv[]) {
         else if (!strcmp(buffer,"add_corners_orientation")) { 
             starting_position = attempted_position = add_missing_corner_orientation(starting_position);
         }
+        else if (!strcmp(buffer,"add_corners_permutation")) { 
+            starting_position = attempted_position = add_missing_corner_permutation(starting_position);
+        }
         else if (!strcmp(buffer,"add_corners")) { 
             starting_position = attempted_position = add_missing_corners(starting_position);
         }

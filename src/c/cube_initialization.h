@@ -19,6 +19,10 @@ cube add_missing_corner_orientation(cube c);
  */
 cube add_missing_corners(cube c);
 /**
+ * Adds permutation stickers to corners which aren't stickered yet. (These corners have to be solved in the right position but not orientation)
+ */
+cube add_missing_corner_permutation(cube c);
+/**
  * Adds edges orientation stickers to edges which aren't stickered yet. (so that the edges that can be solved with RULD)
  */
 cube add_missing_edges_orientation(cube c);
