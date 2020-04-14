@@ -1,12 +1,37 @@
 #include "cube3.h"
-#include "cube_compression.h"
+#include "cube3r.h"
 #include <stdint.h>
 #include <assert.h>
 
-int unpack_secret [43] = {0, 3, 0, 4, 5, 1, 5, 0, 3, 0, 0, 2, 0, 5, 0, 1, 3, 4, 1, 2, 4, 0, 0, 0, 3, 0, 5, 2, 0, 0, 4, 0, 1, 0, 2, 0, 6,6,6,6,6,6, 6};
+#define UNPACK_DIM_LEN 8
+
+int unpack_secret [64] = {-1};
 // this means : if you have a corner where left color is X, right color is Y then top color is unpack_secret[X*6 + Y].
 // For packing cubes with ghost corners must always use either fully occupied corners or fully empty
-// for OLL for packing it's recommended to encode 4 identical corner pieces.
+
+void initialize_cube_compression(void) {
+    for (int i=0; i<64; i++) {
+        unpack_secret[i] = -1;
+    }
+    int corners_in_proper_order[8][3] = {
+         {7, 9, 14}, {8, 6, 23}, {15, 11, 18}, {19, 10, 22}, {3, 5, 12}, {4, 2, 21}, {16, 1, 13}, {0, 17, 20}
+    };
+    for (int corner_id = 0; corner_id <8; corner_id++) {
+        int a = corners_in_proper_order[corner_id][0] / 4;
+        int b = corners_in_proper_order[corner_id][1] / 4;
+        int c = corners_in_proper_order[corner_id][2] / 4;
+        unpack_secret[a * UNPACK_DIM_LEN + b] = c;
+        unpack_secret[b * UNPACK_DIM_LEN + c] = a;
+        unpack_secret[c * UNPACK_DIM_LEN + a] = b;
+    }
+    for (int i=0; i<6; i++) {
+        unpack_secret[i * UNPACK_DIM_LEN + i] = i;
+    }
+    //7 7 0 corner is a special case used for corner orientation
+    unpack_secret[7 * UNPACK_DIM_LEN + 7] = 0;
+    unpack_secret[7 * UNPACK_DIM_LEN + 0] = 7;
+    unpack_secret[0 * UNPACK_DIM_LEN + 7] = 7;
+}
 
 int8_t unpack_last_move(__uint128_t compressed) {
     return (int8_t)compressed;
@@ -33,14 +58,14 @@ void unpack_ce(cube *c, int8_t *last_move, __uint128_t compressed) {
         edges[i] = compressed & mask;
         compressed >>= 3;
     }
-    corners[0] = unpack_secret[ corners[17] * 6 + corners[20]];
-    corners[1] = unpack_secret[ corners[13] * 6 + corners[16]];
-    corners[2] = unpack_secret[ corners[21] * 6 + corners[4]];
-    corners[3] = unpack_secret[ corners[5] * 6 + corners[12]];
-    corners[8] = unpack_secret[ corners[6] * 6 + corners[23]];
-    corners[9] = unpack_secret[ corners[14] * 6 + corners[7]];
-    corners[10] = unpack_secret[ corners[22] * 6 + corners[19]];
-    corners[11] = unpack_secret[ corners[18] * 6 + corners[15]];
+    corners[0] = unpack_secret[ corners[17] * UNPACK_DIM_LEN + corners[20]];
+    corners[1] = unpack_secret[ corners[13] * UNPACK_DIM_LEN + corners[16]];
+    corners[2] = unpack_secret[ corners[21] * UNPACK_DIM_LEN + corners[4]];
+    corners[3] = unpack_secret[ corners[5] * UNPACK_DIM_LEN + corners[12]];
+    corners[8] = unpack_secret[ corners[6] * UNPACK_DIM_LEN + corners[23]];
+    corners[9] = unpack_secret[ corners[14] * UNPACK_DIM_LEN + corners[7]];
+    corners[10] = unpack_secret[ corners[22] * UNPACK_DIM_LEN + corners[19]];
+    corners[11] = unpack_secret[ corners[18] * UNPACK_DIM_LEN + corners[15]];
     
 }
 

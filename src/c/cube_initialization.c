@@ -5,7 +5,7 @@
 
 //TODO: change this to 0, 7, 7
 int oll_corners_colors[3] = {
-    3/4, 12/4, 5/4
+    0, 7, 7
 };
 
 int corners[24] = {
@@ -153,6 +153,7 @@ cube add_missing_edges_orientation(cube c) {
     for (int i=0; i<24; i+=2) {
         if (c.edges[edges[i]] == NO_STICKER) {
             cc.edges[edges[i]] = 0;
+            cc.edges[edges[i+1]] = 7;
         }
     }
     return cc;

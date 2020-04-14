@@ -579,7 +579,8 @@ int main(int argc, char* argv[]) {
     cache_size /= sizeof(solver_cube_packed);
 
     set_all_rotations();
-
+    initialize_cube_compression();
+    
     cube starting_position = full_cube();
     cube attempted_position = full_cube();
 
