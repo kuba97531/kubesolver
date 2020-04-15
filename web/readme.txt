@@ -66,7 +66,7 @@ add_edge DB
 add_edge DF
 F2 L2 F' D2 L2 F' R2 B2 D2 L2 U2 L' D L B2 R' D' U' R F2
 solve
-./kubesolver.exe --silent --exit_on_find < in.txt
+./kubesolver.exe --silent -n 1 < in.txt
 F2 D' L2 B F'
 
 5) this example shows how to solve a yellow-xcross with a BL slot.
@@ -85,6 +85,12 @@ F2 L2 F' D2 L2 F' R2 B2 D2 L2 U2 L' D L B2 R' D' U' R F2
 solve_two_phase
 L F2 D2 L2 R' B2 U' F2 L B' U' R2 D' B2 D R2 D' L2 F2 U2 B2 U' F2 D
 
+Program command line arguments:
+-------------------------------
+--silent                                  - don't print Info: statements
+--max-number-of-sequences N, -n N         - stop search after finding N sequences (default unlimited)
+--max-depth-of-search N, -d N             - only search sequences of length at most N (doesn't apply to two phase solver)
+
 
 List of commands:
 -----------------
@@ -100,6 +106,7 @@ add_edge xx
 add_corner yy
 add_edges_orientation - all edges that has not been added explicitely by add_edge will be required to have good orientation (according to the LRUD-gen)
 add_corners_orientation - same as edges
+add_corners_permutation - all corners that has not been added explicitely by add_corner will be required to be in a correct spot ignoring their orientation.
 add_f2l - adds all edges and corners for bottom two layers.
 
 Commands to solve a cube:
