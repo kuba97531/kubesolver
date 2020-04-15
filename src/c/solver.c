@@ -371,10 +371,10 @@ int is_forbidden_sequence(int sequence_len, int sequence[], int direction) {
     return 0;
 }
 
-int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt, int exit_on_find, int print_sequences) {
+int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt, int max_number_of_output_sequences, int print_sequences) {
     int c_level_start = f;
     int cc_level_start = ff;
-    int result = 0;
+    int sequences_found = 0;
     while (f < t && ff < tt) {
         int cmp = solver_cube_compare(c + f, cc + ff);
         if (cmp == 0) {
@@ -398,11 +398,9 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
                     printf("\n");
                     fflush(stdout);
                 }
-                if (exit_on_find) {
-                    return 1;
-                }
-                else {
-                    result = 1;
+                sequences_found++;
+                if (sequences_found > max_number_of_output_sequences) {
+                    return sequences_found;
                 }
             }
             f++;
@@ -416,7 +414,7 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
             ff++;
         }
     }
-    return result;
+    return sequences_found;
 }
 
 void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube* cc, int levels, uint64_t cache_size) {
@@ -509,7 +507,7 @@ void solve_two_phase(int input_sequence[], int input_sequence_len, int levels, u
 
 }
 
-void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find){
+void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of_output_sequences){
     solver_cube_packed* cache_c;
     solver_cube_packed* cache_cc;
     solver_cube_packed* mergesort_cache;
@@ -540,7 +538,9 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
     int level_c = 0;
     int level_cc = 0;
 
-    for (int i=0; i<levels; i++) {
+    int sequences_found = 0;
+
+    while(1) {
         
         cache_c[level_end_c].packed = level_start_c;
         int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache, 1);
@@ -548,10 +548,14 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
         level_c++;
-        info("Searching %d move solutions...", level_c + level_cc );
+        info("Searching %d move solutions...", level_c + level_cc);
 
-        int found = find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find, 1);
-        if (found && exit_on_find) {
+        sequences_found += find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, max_number_of_output_sequences, 1);
+        if (sequences_found > max_number_of_output_sequences) {
+            goto SOLVE_FINALLY;
+        }
+
+        if (level_c + level_cc >= levels) {
             goto SOLVE_FINALLY;
         }
 
@@ -561,8 +565,11 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int exit_on_find)
         level_end_cc = new_level_end;
         level_cc++;
         info("Searching %d move solutions...", level_c + level_cc );
-        found = find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, exit_on_find, 1);
-        if (found && exit_on_find) {
+        sequences_found += find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, max_number_of_output_sequences, 1);
+        if (sequences_found > max_number_of_output_sequences) {
+            goto SOLVE_FINALLY;
+        }
+        if (level_c + level_cc >= levels) {
             goto SOLVE_FINALLY;
         }
     }
@@ -585,23 +592,45 @@ int main(int argc, char* argv[]) {
     cube attempted_position = full_cube();
 
     char buffer[100];
-    int exit_on_find = 0;
+    int max_number_of_output_sequences = 1000000;
+    int max_depth = 22;
 
     int applied_rotations[10000];
     int applied_rotations_n = 0;
 
-    for (int i=0; i< argc; i++) {
+    for (int i=1; i< argc; i++) {
         char* arg = argv[i];
         if (!strcmp(arg,"--silent")) {
             disable_info_messages();
+        } else if (!strcmp(arg,"--max-number-of-sequences") || !strcmp(arg,"-n")) {
+            int scanf_result = sscanf(argv[++i], "%d", &max_number_of_output_sequences);
+            if (!scanf_result) 
+            {
+                printf("ERROR: invalid argument to %s (%s).\n", arg, argv[i]);
+                exit(1);
+            }
+        } else if (!strcmp(arg,"--max-depth-of-search") || !strcmp(arg,"-d")) {
+            int scanf_result = sscanf(argv[++i], "%d", &max_depth);
+            if (!scanf_result) 
+            {
+                printf("ERROR: invalid argument to %s (%s).\n", arg, argv[i]);
+                exit(1);
+            }
         }
-        if (!strcmp(arg,"--exit_on_find")) {
-            exit_on_find = 1;
+        else {
+            printf("ERROR: unknown argument %s.\n", arg);
+            exit(1);
         }
     }
 
-    info("KubeSolver 1.0 (C) Jakub Straszewski 2020");
+    info("KubeSolver 1.0.1 (C) Jakub Straszewski 2020");
 
+    if (max_depth != 22) {
+        info("Setting max search depth to %d moves.\n", max_depth);
+    }
+    if (max_number_of_output_sequences != 1000000) {
+        info("Setting max number of output sequences to %d.\n", max_number_of_output_sequences);
+    }
     while (scanf("%s", buffer) != EOF) {
         //apply rotation
         int found = 0;
@@ -641,9 +670,6 @@ int main(int argc, char* argv[]) {
                 exit(1);
             }
             set_3gen(buffer);
-              }
-        else if (!strcmp(buffer,"exit_on_find")) { 
-            exit_on_find = 1;
         }
         else if (!strcmp(buffer,"init_full_cube")) { 
             attempted_position = starting_position = full_cube();
@@ -714,10 +740,10 @@ int main(int argc, char* argv[]) {
             starting_position = attempted_position = c;
         }
         else if (!strcmp(buffer,"solve")) { 
-            solve(&attempted_position, &starting_position, 11, cache_size, exit_on_find);
+            solve(&attempted_position, &starting_position, max_depth, cache_size, max_number_of_output_sequences);
          }
          else if (!strcmp(buffer,"reconstruct")) { 
-            solve(&starting_position, &attempted_position, 11, cache_size, exit_on_find);
+            solve(&starting_position, &attempted_position, max_depth, cache_size, max_number_of_output_sequences);
          }
          else if (!strcmp(buffer, "solve_two_phase")) {
              solve_two_phase(applied_rotations, applied_rotations_n, 11, cache_size);
