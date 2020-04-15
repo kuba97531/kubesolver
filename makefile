@@ -110,11 +110,7 @@ DEP = $(OBJ_FILES:%.o=%.d)
 OBJ_REBUILD_FILES = $(SRC_ALWAYS_REBUILD_FILES:%.c=$(OBJDIR)/%$(BUILD_POSTFIX).o)
 ALL_OBJ_FILES = $(OBJ_FILES) $(OBJ_REBUILD_FILES)
 
-ifeq ($(NAME),solver)
-	EXE_NAME    = $(EXE_PREFIX)$(NAME).$(FILE_EXT)
-else
-	EXE_NAME    = $(NAME).$(FILE_EXT)
-endif
+EXE_NAME    = kube_solver.$(FILE_EXT)
 
 .DEFAULT_GOAL := $(EXE_NAME)
 
