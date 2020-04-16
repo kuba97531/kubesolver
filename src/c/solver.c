@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
-#include <omp.h>
 
 #include "cube3.h"
 #include "cube3r.h"
@@ -44,75 +43,6 @@ int solver_cube_compare(const void *s1, const void *s2)
         return -1;
     }
     return 0;
-}
-
-#define MERGE_SORT_SWAP(aaaaa,bbbbbb) {solver_cube_packed zzzzzzz = aaaaa; aaaaa= bbbbbb; bbbbbb = zzzzzzz;}
-
-void merge(solver_cube_packed* a, int size, solver_cube_packed* temp) {
-	int i1 = 0;
-	int i2 = size / 2;
-	int it = 0;
-
-	while(i1 < size/2 && i2 < size) {
-		if (solver_cube_compare(a + i1, a + i2) <= 0) {
-			temp[it] = a[i1];
-			i1 += 1;
-		}
-		else {
-			temp[it] = a[i2];
-			i2 += 1;
-		}
-		it += 1;
-	}
-
-	while (i1 < size/2) {
-	    temp[it] = a[i1];
-	    i1++;
-	    it++;
-	}
-	while (i2 < size) {
-	    temp[it] = a[i2];
-	    i2++;
-	    it++;
-	}
-
-	 memcpy(a, temp, size * sizeof(solver_cube_packed));
-}
-
-void mergesort_serial(solver_cube_packed a[], int size, solver_cube_packed temp[]) {
-    if (size == 1) {
-        return;
-    }
-	if (size == 2) { 
-	 	if (solver_cube_compare(a + 0, a + 1) <= 0)
-	 		return;
-	 	else {
-	 		MERGE_SORT_SWAP(a[0], a[1]);
-	 		return;
-	 	}
-	 }
-
-	mergesort_serial(a, size/2, temp);
-	mergesort_serial(a + size/2, size - size/2, temp);
-	merge(a, size, temp);
-}
-
-void mergesort_parallel_omp (solver_cube_packed a[], int size, solver_cube_packed temp[], int threads) {
-    if ( threads == 1 || size < 64) {
-        // mergesort_serial(a, size, temp);
-        qsort(a , size, sizeof(solver_cube_packed), solver_cube_compare);
-    }
-    else if (threads > 1) {
-        #pragma omp parallel sections
-        {
-             #pragma omp section
-             mergesort_parallel_omp(a, size/2, temp, threads/2);
-             #pragma omp section
-             mergesort_parallel_omp(a + size/2, size-size/2,
-                 temp + size/2, threads-threads/2);
-        }
-        merge(a, size, temp);
-    } 
 }
 
 void print_mask(__uint128_t t) {
@@ -165,21 +95,9 @@ void assert_sorted(solver_cube_packed *a, int from, int size) {
     }
 }
 
-void sort_cubes(solver_cube_packed* arr, int from, int to, solver_cube_packed* mergesort_temp) 
+void sort_cubes(solver_cube_packed* arr, int from, int to) 
 {
-    if (mergesort_temp != NULL) {
-        int num_threads;
-        #pragma omp parallel
-        {
-            #pragma omp master
-            {
-                num_threads = omp_get_num_threads();
-            }
-        }
-        mergesort_parallel_omp(arr + from, to - from, mergesort_temp + from, num_threads);
-    } else {
-        qsort(arr + from, to - from, sizeof(solver_cube_packed), solver_cube_compare);
-    }
+    qsort(arr + from, to - from, sizeof(solver_cube_packed), solver_cube_compare);
     assert_sorted(arr, from, to-from);
 }
 
@@ -218,7 +136,7 @@ int remove_duplicates(solver_cube_packed* arr, int from, int to) {
 int legal_rotations[40];
 int legal_rotations_len = 0;
 
-int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_start, int level_end, int new_level_start, solver_cube_packed* mergesort_temp, int direction) {
+int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_start, int level_end, int new_level_start, int direction) {
     int new_level_end = new_level_start;
     for (int c = level_start; c < level_end; c++) {
         solver_cube_unpacked current_unpacked;
@@ -242,7 +160,7 @@ int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_
             new_level_end++;
         }
     }
-    sort_cubes(cache, level_end, new_level_end, mergesort_temp);
+    sort_cubes(cache, level_end, new_level_end);
 
     for (int i= level_end; i<new_level_end - 1; i++) {
         if (solver_cube_compare(cache+i, cache + i+1) > 0 )
@@ -420,14 +338,12 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
 void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube* cc, int levels, uint64_t cache_size) {
     solver_cube_packed* cache_c;
     solver_cube_packed* cache_cc;
-    solver_cube_packed* mergesort_cache;
 
     cache_size /= 3;
 
     cache_c = malloc(cache_size  * sizeof(solver_cube_packed));
     cache_cc = malloc(cache_size  * sizeof(solver_cube_packed));
-    mergesort_cache = malloc(cache_size  * sizeof(solver_cube_packed));
-    if (cache_c == NULL || cache_cc == NULL || mergesort_cache == NULL) {
+    if (cache_c == NULL || cache_cc == NULL) {
         printf("ERROR: not enough memory\n");
         exit(0);
     }
@@ -445,7 +361,7 @@ void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube
     for (int i=0; i<levels; i++) {
         
         cache_c[level_end_c].packed = level_start_c;
-        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache, 1);
+        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, 1);
 
         level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
@@ -455,7 +371,7 @@ void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube
         if (found)  goto SOLVE_PHASE_FINALLY;
 
         cache_cc[level_end_cc].packed = level_start_cc;
-        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache, -1);
+        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, -1);
         level_start_cc = level_end_cc + 1;
         level_end_cc = new_level_end;
         level_cc++;
@@ -466,7 +382,6 @@ void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube
     SOLVE_PHASE_FINALLY:
         free(cache_c);
         free(cache_cc);
-        if (mergesort_cache != NULL) free(mergesort_cache);
         return;
 }
 
@@ -510,19 +425,14 @@ void solve_two_phase(int input_sequence[], int input_sequence_len, int levels, u
 void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of_output_sequences){
     solver_cube_packed* cache_c;
     solver_cube_packed* cache_cc;
-    solver_cube_packed* mergesort_cache;
 
     cache_size /= 3;
 
     cache_c = malloc(cache_size  * sizeof(solver_cube_packed));
     cache_cc = malloc(cache_size  * sizeof(solver_cube_packed));
-    mergesort_cache = malloc(cache_size  * sizeof(solver_cube_packed));
     if (cache_c == NULL || cache_cc == NULL) {
         printf("ERROR: not enough memory\n");
         exit(0);
-    }
-    if (mergesort_cache == NULL) {
-        info("Failed to allocate enough memory for extra cache - using qsort instead of mergesort\n");
     }
 
     cache_c[0].packed = pack_ce(c, 0);
@@ -543,7 +453,7 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of
     while(1) {
         
         cache_c[level_end_c].packed = level_start_c;
-        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, mergesort_cache, 1);
+        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, 1);
 
         level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
@@ -560,7 +470,7 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of
         }
 
         cache_cc[level_end_cc].packed = level_start_cc;
-        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, mergesort_cache, -1);
+        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, -1);
         level_start_cc = level_end_cc + 1;
         level_end_cc = new_level_end;
         level_cc++;
@@ -576,7 +486,6 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of
     SOLVE_FINALLY:
         free(cache_c);
         free(cache_cc);
-        if (mergesort_cache != NULL) free(mergesort_cache);
         return;
 }
 
