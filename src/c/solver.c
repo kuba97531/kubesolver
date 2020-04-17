@@ -23,14 +23,34 @@ typedef struct
     int8_t last_move;
 } solver_cube_unpacked;
 
-// int solver_cube_compare(const void *s1, const void *s2)
-// {
-//     cube c1, c2;
-//     int8_t last_move;
-//     unpack_ce(&c1, &last_move, ((solver_cube_packed *)s1)->packed);
-//     unpack_ce(&c2, &last_move, ((solver_cube_packed *)s2)->packed);
-//     return cube_compare(&c1, &c2);
-// }
+
+typedef struct {
+  solver_cube_packed *array;
+  uint64_t used;
+  uint64_t size;
+} growing_cache;
+
+const int initial_cache_size = 1024*16;
+
+void init(growing_cache* cache) {
+    cache->array = malloc(initial_cache_size * sizeof(solver_cube_packed));
+    cache->used = 0;
+    cache->size = initial_cache_size;
+}
+
+void resize(growing_cache* cache) {
+    if (cache->used > cache->size - 1) {
+        uint64_t new_size = cache->size * 2;
+        //info("regrowing cache to %d, as it's too small", new_size);
+        solver_cube_packed* bigger = realloc(cache->array, new_size * sizeof(solver_cube_packed));
+        if (bigger == NULL) {
+            printf("ERROR: not enough memory\n");
+            exit(0);
+        }
+        cache->size = cache->size * 2;
+        cache->array = bigger;
+    }
+}
 
 int solver_cube_compare(const void *s1, const void *s2)
 {
@@ -122,7 +142,7 @@ int is_forbidden_pair(int r1, int r2, int direction) {
     return 0;
 }
 
-// Returns the number of lat unique element
+// Returns the number of last unique element
 int remove_duplicates(solver_cube_packed* arr, int from, int to) {
     int last_unique = from;
     for (int i = from + 1; i<to; i++ ) {
@@ -136,12 +156,12 @@ int remove_duplicates(solver_cube_packed* arr, int from, int to) {
 int legal_rotations[40];
 int legal_rotations_len = 0;
 
-int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_start, int level_end, int new_level_start, int direction) {
+int generate_new_level(growing_cache* cache, int level_start, int level_end, int new_level_start, int direction) {
     int new_level_end = new_level_start;
     for (int c = level_start; c < level_end; c++) {
         solver_cube_unpacked current_unpacked;
         
-        unpack_ce(&current_unpacked.cube, &current_unpacked.last_move, cache[c].packed);
+        unpack_ce(&current_unpacked.cube, &current_unpacked.last_move, cache->array[c].packed);
         int current_rotation = current_unpacked.last_move;        
 
         for (int i=0; i<legal_rotations_len; i++)  {
@@ -150,28 +170,25 @@ int generate_new_level(solver_cube_packed* cache, int max_cache_size, int level_
             {
                 continue;
             }
-            if (new_level_end >= max_cache_size) {
-                info("Memory limit exceeded. Terminating\n");
-                exit(-1);
-                return -1;
-            }
             cube rotated = all_rotations[rotation](&current_unpacked.cube);
-            cache[new_level_end].packed = pack_ce(&rotated, rotation);
+            cache->array[new_level_end].packed = pack_ce(&rotated, rotation);
             new_level_end++;
+            cache->used = new_level_end;
+            resize(cache);
         }
     }
-    sort_cubes(cache, level_end, new_level_end);
+    sort_cubes(cache->array, level_end, new_level_end);
 
     for (int i= level_end; i<new_level_end - 1; i++) {
-        if (solver_cube_compare(cache+i, cache + i+1) > 0 )
+        if (solver_cube_compare(cache->array + i, cache->array + i+1) > 0 )
         {
             printf("SORTING FAILURE at i = %d\n", i);
             fprintf(stderr, "SORTING FAILURE\n");
             return -1;
         }
     }
-
-    level_end = remove_duplicates(cache, level_start, new_level_end);
+    level_end = remove_duplicates(cache->array, level_start, new_level_end);
+    cache->used = level_end;
     return level_end;
 }
 
@@ -181,12 +198,12 @@ int reverse_rotation(int rotation_id) {
 }
 
 // We know that cachepleft] is <= element and cache[right] > element
-int find_index_in_cache_level(solver_cube_packed* cache, int left, int right, solver_cube_packed* element) {
+int find_index_in_cache_level(solver_cube_packed* array, int left, int right, solver_cube_packed* element) {
     assert(left >=0);
     assert(left < right);
     while (left + 1 < right) {
         int middle = (left + right)/2;
-        int cmp = solver_cube_compare(cache + middle, element);
+        int cmp = solver_cube_compare(array + middle, element);
         if (cmp == 0 ) {
             return middle;
         }
@@ -197,14 +214,14 @@ int find_index_in_cache_level(solver_cube_packed* cache, int left, int right, so
         }
     }
 
-    if (solver_cube_compare(cache + left, element) == 0) {
+    if (solver_cube_compare(array + left, element) == 0) {
         //should always be true
         return left;
     }
     
     printf("ERROR! find didn't find a sequence between %d and %d!\n", left, right);
     for (int i = left; i<right; i++) {
-        int cmp = solver_cube_compare(cache + i, element);
+        int cmp = solver_cube_compare(array + i, element);
         if (cmp ==0 ) {
             printf("but should have found %d\n", i);
         }
@@ -335,21 +352,15 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
     return sequences_found;
 }
 
-void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube* cc, int levels, uint64_t cache_size) {
-    solver_cube_packed* cache_c;
-    solver_cube_packed* cache_cc;
+void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube* cc, int levels) {
+    growing_cache cache_c;
+    growing_cache cache_cc;
 
-    cache_size /= 3;
-
-    cache_c = malloc(cache_size  * sizeof(solver_cube_packed));
-    cache_cc = malloc(cache_size  * sizeof(solver_cube_packed));
-    if (cache_c == NULL || cache_cc == NULL) {
-        printf("ERROR: not enough memory\n");
-        exit(0);
-    }
+    init(&cache_c);
+    init(&cache_cc);
     
-    cache_c[0].packed = pack_ce(c, 0);
-    cache_cc[0].packed = pack_ce(cc, 0);
+    cache_c.array[0].packed = pack_ce(c, 0);
+    cache_cc.array[0].packed = pack_ce(cc, 0);
     
     int level_start_c = 0;
     int level_end_c = 1;
@@ -360,32 +371,32 @@ void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube
 
     for (int i=0; i<levels; i++) {
         
-        cache_c[level_end_c].packed = level_start_c;
-        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, 1);
+        cache_c.array[level_end_c].packed = level_start_c;
+        int new_level_end = generate_new_level(&cache_c, level_start_c, level_end_c, level_end_c + 1, 1);
 
         level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
         level_c++;
 
-        int found = find_sequence(out_sequence, out_sequence_len, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, 1, 0);
+        int found = find_sequence(out_sequence, out_sequence_len, cache_c.array, level_start_c, level_end_c , cache_cc.array, level_start_cc, level_end_cc, 1, 0);
         if (found)  goto SOLVE_PHASE_FINALLY;
 
-        cache_cc[level_end_cc].packed = level_start_cc;
-        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, -1);
+        cache_cc.array[level_end_cc].packed = level_start_cc;
+        new_level_end = generate_new_level(&cache_cc, level_start_cc, level_end_cc, level_end_cc+1, -1);
         level_start_cc = level_end_cc + 1;
         level_end_cc = new_level_end;
         level_cc++;
 
-        found = find_sequence(out_sequence, out_sequence_len, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, 1, 0);
+        found = find_sequence(out_sequence, out_sequence_len, cache_c.array, level_start_c, level_end_c , cache_cc.array, level_start_cc, level_end_cc, 1, 0);
         if (found) goto SOLVE_PHASE_FINALLY;
     }
     SOLVE_PHASE_FINALLY:
-        free(cache_c);
-        free(cache_cc);
+        free(cache_c.array);
+        free(cache_cc.array);
         return;
 }
 
-void solve_two_phase(int input_sequence[], int input_sequence_len, int levels, uint64_t cache_size)
+void solve_two_phase(int input_sequence[], int input_sequence_len, int levels)
 {
     cube starting_position, attempted_position;
 
@@ -397,7 +408,7 @@ void solve_two_phase(int input_sequence[], int input_sequence_len, int levels, u
         attempted_position = all_rotations[input_sequence[i]](&attempted_position);
     }
     set_3gen("RLFBDU");
-    solve_single_phase(phase_solution, &phase_count, &attempted_position, &starting_position, levels, cache_size);
+    solve_single_phase(phase_solution, &phase_count, &attempted_position, &starting_position, levels);
     print_sequence(phase_count, phase_solution);
 
     starting_position = attempted_position = full_cube();
@@ -409,35 +420,20 @@ void solve_two_phase(int input_sequence[], int input_sequence_len, int levels, u
     }
     printf("\n");
     set_3gen("R2L2F2B2DU");
-    solve_single_phase(phase_solution, &phase_count, &attempted_position, &starting_position, levels, cache_size);
+    solve_single_phase(phase_solution, &phase_count, &attempted_position, &starting_position, levels);
     print_sequence(phase_count, phase_solution);
     printf("\n");
-
-    // for (int i=0; i<first_phase_count; i++) {
-    //     cc = all_rotations[first_phase[i]](cc);
-    // }
-    // set_3gen("R2L2");
-    // solve_single_phase(phase_solution, &phase_count, c, cc, levels, cache_size);
-    // print_sequence(phase_count, phase_solution);
-
 }
 
-void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of_output_sequences){
-    solver_cube_packed* cache_c;
-    solver_cube_packed* cache_cc;
+void solve(cube* c, cube* cc, int levels, int max_number_of_output_sequences){
+    growing_cache cache_c;
+    growing_cache cache_cc;
 
-    cache_size /= 3;
-
-    cache_c = malloc(cache_size  * sizeof(solver_cube_packed));
-    cache_cc = malloc(cache_size  * sizeof(solver_cube_packed));
-    if (cache_c == NULL || cache_cc == NULL) {
-        printf("ERROR: not enough memory\n");
-        exit(0);
-    }
-
-    cache_c[0].packed = pack_ce(c, 0);
+    init(&cache_c);
+    init(&cache_cc);
     
-    cache_cc[0].packed = pack_ce(cc, 0);
+    cache_c.array[0].packed = pack_ce(c, 0);
+    cache_cc.array[0].packed = pack_ce(cc, 0);
     
     int level_start_c = 0;
     int level_end_c = 1;
@@ -451,16 +447,15 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of
     int sequences_found = 0;
 
     while(1) {
-        
-        cache_c[level_end_c].packed = level_start_c;
-        int new_level_end = generate_new_level(cache_c, cache_size, level_start_c, level_end_c, level_end_c + 1, 1);
+        cache_c.array[level_end_c].packed = level_start_c;
+        int new_level_end = generate_new_level(&cache_c, level_start_c, level_end_c, level_end_c + 1, 1);
 
         level_start_c = level_end_c + 1;
         level_end_c = new_level_end;
         level_c++;
         info("Searching %d move solutions...", level_c + level_cc);
 
-        sequences_found += find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, max_number_of_output_sequences, 1);
+        sequences_found += find_sequence(NULL, NULL, cache_c.array, level_start_c, level_end_c , cache_cc.array, level_start_cc, level_end_cc, max_number_of_output_sequences - sequences_found, 1);
         if (sequences_found > max_number_of_output_sequences) {
             goto SOLVE_FINALLY;
         }
@@ -469,13 +464,13 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of
             goto SOLVE_FINALLY;
         }
 
-        cache_cc[level_end_cc].packed = level_start_cc;
-        new_level_end = generate_new_level(cache_cc, cache_size, level_start_cc, level_end_cc, level_end_cc+1, -1);
+        cache_cc.array[level_end_cc].packed = level_start_cc;
+        new_level_end = generate_new_level(&cache_cc, level_start_cc, level_end_cc, level_end_cc+1, -1);
         level_start_cc = level_end_cc + 1;
         level_end_cc = new_level_end;
         level_cc++;
         info("Searching %d move solutions...", level_c + level_cc );
-        sequences_found += find_sequence(NULL, NULL, cache_c, level_start_c, level_end_c , cache_cc, level_start_cc, level_end_cc, max_number_of_output_sequences, 1);
+        sequences_found += find_sequence(NULL, NULL, cache_c.array, level_start_c, level_end_c , cache_cc.array, level_start_cc, level_end_cc, max_number_of_output_sequences - sequences_found, 1);
         if (sequences_found > max_number_of_output_sequences) {
             goto SOLVE_FINALLY;
         }
@@ -484,16 +479,13 @@ void solve(cube* c, cube* cc, int levels, uint64_t cache_size, int max_number_of
         }
     }
     SOLVE_FINALLY:
-        free(cache_c);
-        free(cache_cc);
+        free(cache_c.array);
+        free(cache_cc.array);
         return;
 }
 
 
 int main(int argc, char* argv[]) {
-    uint64_t cache_size = portable_available_memory();
-    cache_size /= sizeof(solver_cube_packed);
-
     set_all_rotations();
     initialize_cube_compression();
     
@@ -649,13 +641,13 @@ int main(int argc, char* argv[]) {
             starting_position = attempted_position = c;
         }
         else if (!strcmp(buffer,"solve")) { 
-            solve(&attempted_position, &starting_position, max_depth, cache_size, max_number_of_output_sequences);
+            solve(&attempted_position, &starting_position, max_depth, max_number_of_output_sequences);
          }
          else if (!strcmp(buffer,"reconstruct")) { 
-            solve(&starting_position, &attempted_position, max_depth, cache_size, max_number_of_output_sequences);
+            solve(&starting_position, &attempted_position, max_depth, max_number_of_output_sequences);
          }
          else if (!strcmp(buffer, "solve_two_phase")) {
-             solve_two_phase(applied_rotations, applied_rotations_n, 11, cache_size);
+             solve_two_phase(applied_rotations, applied_rotations_n, 11);
          }
          else {
              printf("ERROR: Unknown command %s\n", buffer);
