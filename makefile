@@ -36,7 +36,6 @@ SRCDIR   = src/c
 
 COMMON_GCC_FLAGS=\
  -std=c99 \
- -fopenmp
 
 MAIN_ARCH=\
  #-march=ivybridge
@@ -66,8 +65,6 @@ DEBUG_FLAGS=\
  -DNDEBUG
 
 LINKER=\
- -static \
- -fopenmp 
 
 ###############################################################################
 #   CLANG DEBUG FLAGS                                                         #
