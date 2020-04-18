@@ -24,7 +24,7 @@ void initialize_cube_compression(void) {
         unpack_secret[b * UNPACK_DIM_LEN + c] = a;
         unpack_secret[c * UNPACK_DIM_LEN + a] = b;
     }
-    for (int i=0; i<6; i++) {
+    for (int i=0; i<=6; i++) {
         unpack_secret[i * UNPACK_DIM_LEN + i] = i;
     }
     //7 7 0 corner is a special case used for corner orientation
