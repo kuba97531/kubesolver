@@ -524,7 +524,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    info("KubeSolver 1.0.2 (C) Jakub Straszewski 2020");
+    info("KubeSolver 1.0.3 (C) Jakub Straszewski 2020");
 
     if (max_depth != 22) {
         info("Setting max search depth to %d moves.\n", max_depth);
@@ -578,6 +578,10 @@ int main(int argc, char* argv[]) {
         }
         else if (!strcmp(buffer,"init_empty_cube")) { 
             attempted_position = starting_position = empty_cube();
+            applied_rotations_n = 0;
+        }
+        else if (!strcmp(buffer,"init_to_current_state")) { 
+            starting_position = attempted_position;
             applied_rotations_n = 0;
         }
         else if (!strcmp(buffer,"add_edge")) { 

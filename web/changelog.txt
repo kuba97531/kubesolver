@@ -1,0 +1,13 @@
+1.0.3 (19.04.2020)
+==================
+- add init_to_current_state command
+
+1.0.2
+==================
+- Add a build for MAC OS
+- Fixed a bug with add_corner_permuatation
+
+1.0.1
+=====
+- Added add_corners_permutation command
+- Added command line argument --max-number-of-sequences(-n) and --max-depth-of-search(-d)

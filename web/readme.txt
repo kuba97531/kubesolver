@@ -7,7 +7,13 @@ General
 
 The program is able to solve 3x3 Rubik's cube.
 
-The most prominent usecase it the ability to easly generate algorithms for particular cases.
+The most prominent usecase it the ability to easly generate algorithms for particular cases. It's very easy to generate things like:
+ - Generation of algorithms for any last-layer subset (PLL, ZBLL), OLL, OLLCP, last slot + EO.
+ - finding sequences for crosses, x-crosses, eo-crosses.
+
+It supports limited generators, and it can include all standard moves (RUF..), wide moves(lru...), slice moves(MES) and rotations(xyz).
+
+It implements a relatively robust brute-force algorithm.
 
 The simple two-phase solver is there for completness but it's not particularly good or fast.
 
@@ -108,6 +114,8 @@ add_edges_orientation - all edges that has not been added explicitely by add_edg
 add_corners_orientation - same as edges
 add_corners_permutation - all corners that has not been added explicitely by add_corner will be required to be in a correct spot ignoring their orientation.
 add_f2l - adds all edges and corners for bottom two layers.
+
+init_to_current_state - make current state a new starting state. It makes sense if you want to force e.g. a particular OLL (to force a known ZBLL)
 
 Commands to solve a cube:
 -------------------------
