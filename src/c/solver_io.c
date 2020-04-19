@@ -10,7 +10,7 @@ void info(char* format, ...)
     if (!print_info) {
         return;
     }
-   printf("INFO:");
+   printf("INFO: ");
    va_list arglist;
    va_start( arglist, format );
    vprintf( format, arglist );
