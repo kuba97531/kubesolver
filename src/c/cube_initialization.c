@@ -6,7 +6,7 @@
 
 //TODO: change this to 0, 7, 7
 int oll_corners_colors[3] = {
-    0, 7, 7
+    6, 7, 7
 };
 
 int corners[24] = {

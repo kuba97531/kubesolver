@@ -28,9 +28,9 @@ void initialize_cube_compression(void) {
         unpack_secret[i * UNPACK_DIM_LEN + i] = i;
     }
     //7 7 0 corner is a special case used for corner orientation
-    unpack_secret[7 * UNPACK_DIM_LEN + 7] = 0;
-    unpack_secret[7 * UNPACK_DIM_LEN + 0] = 7;
-    unpack_secret[0 * UNPACK_DIM_LEN + 7] = 7;
+    unpack_secret[7 * UNPACK_DIM_LEN + 7] = 6;
+    unpack_secret[7 * UNPACK_DIM_LEN + 6] = 7;
+    unpack_secret[6 * UNPACK_DIM_LEN + 7] = 7;
 }
 
 int8_t unpack_last_move(__uint128_t compressed) {

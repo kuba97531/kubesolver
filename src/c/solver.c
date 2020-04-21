@@ -334,7 +334,7 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
                     fflush(stdout);
                 }
                 sequences_found++;
-                if (sequences_found > max_number_of_output_sequences) {
+                if (sequences_found >= max_number_of_output_sequences) {
                     return sequences_found;
                 }
             }
@@ -456,7 +456,7 @@ void solve(cube* c, cube* cc, int levels, int max_number_of_output_sequences){
         info("Searching %d move solutions...", level_c + level_cc);
 
         sequences_found += find_sequence(NULL, NULL, cache_c.array, level_start_c, level_end_c , cache_cc.array, level_start_cc, level_end_cc, max_number_of_output_sequences - sequences_found, 1);
-        if (sequences_found > max_number_of_output_sequences) {
+        if (sequences_found >= max_number_of_output_sequences) {
             goto SOLVE_FINALLY;
         }
 
@@ -471,7 +471,7 @@ void solve(cube* c, cube* cc, int levels, int max_number_of_output_sequences){
         level_cc++;
         info("Searching %d move solutions...", level_c + level_cc );
         sequences_found += find_sequence(NULL, NULL, cache_c.array, level_start_c, level_end_c , cache_cc.array, level_start_cc, level_end_cc, max_number_of_output_sequences - sequences_found, 1);
-        if (sequences_found > max_number_of_output_sequences) {
+        if (sequences_found >= max_number_of_output_sequences) {
             goto SOLVE_FINALLY;
         }
         if (level_c + level_cc >= levels) {

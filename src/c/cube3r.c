@@ -451,7 +451,7 @@ cube B_3(cube *other) {
 
 cube x_1(cube *other) {
     cube result;
-    int color_swap[7] = { 4, 0, 1, 3, 2, 5, 6 };
+    int color_swap[8] = { 4, 0, 1, 3, 2, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[4]];
     result.edges[1] = color_swap[other->edges[5]];
     result.edges[2] = color_swap[other->edges[6]];
@@ -505,7 +505,7 @@ cube x_1(cube *other) {
 
 cube x_2(cube *other) {
     cube result;
-    int color_swap[7] = { 2, 4, 0, 3, 1, 5, 6 };
+    int color_swap[8] = { 2, 4, 0, 3, 1, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[8]];
     result.edges[1] = color_swap[other->edges[9]];
     result.edges[2] = color_swap[other->edges[10]];
@@ -559,7 +559,7 @@ cube x_2(cube *other) {
 
 cube x_3(cube *other) {
     cube result;
-    int color_swap[7] = { 1, 2, 4, 3, 0, 5, 6 };
+    int color_swap[8] = { 1, 2, 4, 3, 0, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[18]];
     result.edges[1] = color_swap[other->edges[19]];
     result.edges[2] = color_swap[other->edges[16]];
@@ -613,7 +613,7 @@ cube x_3(cube *other) {
 
 cube y_1(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 5, 2, 1, 3, 4, 6 };
+    int color_swap[8] = { 0, 5, 2, 1, 3, 4, 6, 7 };
     result.edges[0] = color_swap[other->edges[3]];
     result.edges[1] = color_swap[other->edges[0]];
     result.edges[2] = color_swap[other->edges[1]];
@@ -667,7 +667,7 @@ cube y_1(cube *other) {
 
 cube y_2(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 4, 2, 5, 1, 3, 6 };
+    int color_swap[8] = { 0, 4, 2, 5, 1, 3, 6, 7 };
     result.edges[0] = color_swap[other->edges[2]];
     result.edges[1] = color_swap[other->edges[3]];
     result.edges[2] = color_swap[other->edges[0]];
@@ -721,7 +721,7 @@ cube y_2(cube *other) {
 
 cube y_3(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 3, 2, 4, 5, 1, 6 };
+    int color_swap[8] = { 0, 3, 2, 4, 5, 1, 6, 7 };
     result.edges[0] = color_swap[other->edges[1]];
     result.edges[1] = color_swap[other->edges[2]];
     result.edges[2] = color_swap[other->edges[3]];
@@ -775,7 +775,7 @@ cube y_3(cube *other) {
 
 cube z_1(cube *other) {
     cube result;
-    int color_swap[7] = { 3, 1, 5, 2, 4, 0, 6 };
+    int color_swap[8] = { 3, 1, 5, 2, 4, 0, 6, 7 };
     result.edges[0] = color_swap[other->edges[23]];
     result.edges[1] = color_swap[other->edges[20]];
     result.edges[2] = color_swap[other->edges[21]];
@@ -829,7 +829,7 @@ cube z_1(cube *other) {
 
 cube z_2(cube *other) {
     cube result;
-    int color_swap[7] = { 2, 1, 0, 5, 4, 3, 6 };
+    int color_swap[8] = { 2, 1, 0, 5, 4, 3, 6, 7 };
     result.edges[0] = color_swap[other->edges[10]];
     result.edges[1] = color_swap[other->edges[11]];
     result.edges[2] = color_swap[other->edges[8]];
@@ -883,7 +883,7 @@ cube z_2(cube *other) {
 
 cube z_3(cube *other) {
     cube result;
-    int color_swap[7] = { 5, 1, 3, 0, 4, 2, 6 };
+    int color_swap[8] = { 5, 1, 3, 0, 4, 2, 6, 7 };
     result.edges[0] = color_swap[other->edges[13]];
     result.edges[1] = color_swap[other->edges[14]];
     result.edges[2] = color_swap[other->edges[15]];
@@ -937,7 +937,7 @@ cube z_3(cube *other) {
 
 cube M_1(cube *other) {
     cube result;
-    int color_swap[7] = { 1, 2, 4, 3, 0, 5, 6 };
+    int color_swap[8] = { 1, 2, 4, 3, 0, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[18]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[16]];
@@ -991,7 +991,7 @@ cube M_1(cube *other) {
 
 cube M_2(cube *other) {
     cube result;
-    int color_swap[7] = { 2, 4, 0, 3, 1, 5, 6 };
+    int color_swap[8] = { 2, 4, 0, 3, 1, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[8]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[10]];
@@ -1045,7 +1045,7 @@ cube M_2(cube *other) {
 
 cube M_3(cube *other) {
     cube result;
-    int color_swap[7] = { 4, 0, 1, 3, 2, 5, 6 };
+    int color_swap[8] = { 4, 0, 1, 3, 2, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[4]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[6]];
@@ -1099,7 +1099,7 @@ cube M_3(cube *other) {
 
 cube E_1(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 3, 2, 4, 5, 1, 6 };
+    int color_swap[8] = { 0, 3, 2, 4, 5, 1, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -1153,7 +1153,7 @@ cube E_1(cube *other) {
 
 cube E_2(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 4, 2, 5, 1, 3, 6 };
+    int color_swap[8] = { 0, 4, 2, 5, 1, 3, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -1207,7 +1207,7 @@ cube E_2(cube *other) {
 
 cube E_3(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 5, 2, 1, 3, 4, 6 };
+    int color_swap[8] = { 0, 5, 2, 1, 3, 4, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -1261,7 +1261,7 @@ cube E_3(cube *other) {
 
 cube S_1(cube *other) {
     cube result;
-    int color_swap[7] = { 3, 1, 5, 2, 4, 0, 6 };
+    int color_swap[8] = { 3, 1, 5, 2, 4, 0, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[20]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -1315,7 +1315,7 @@ cube S_1(cube *other) {
 
 cube S_2(cube *other) {
     cube result;
-    int color_swap[7] = { 2, 1, 0, 5, 4, 3, 6 };
+    int color_swap[8] = { 2, 1, 0, 5, 4, 3, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[11]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -1369,7 +1369,7 @@ cube S_2(cube *other) {
 
 cube S_3(cube *other) {
     cube result;
-    int color_swap[7] = { 5, 1, 3, 0, 4, 2, 6 };
+    int color_swap[8] = { 5, 1, 3, 0, 4, 2, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[14]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -1423,7 +1423,7 @@ cube S_3(cube *other) {
 
 cube r_1(cube *other) {
     cube result;
-    int color_swap[7] = { 4, 0, 1, 3, 2, 5, 6 };
+    int color_swap[8] = { 4, 0, 1, 3, 2, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[4]];
     result.edges[1] = color_swap[other->edges[5]];
     result.edges[2] = color_swap[other->edges[6]];
@@ -1477,7 +1477,7 @@ cube r_1(cube *other) {
 
 cube r_2(cube *other) {
     cube result;
-    int color_swap[7] = { 2, 4, 0, 3, 1, 5, 6 };
+    int color_swap[8] = { 2, 4, 0, 3, 1, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[8]];
     result.edges[1] = color_swap[other->edges[9]];
     result.edges[2] = color_swap[other->edges[10]];
@@ -1531,7 +1531,7 @@ cube r_2(cube *other) {
 
 cube r_3(cube *other) {
     cube result;
-    int color_swap[7] = { 1, 2, 4, 3, 0, 5, 6 };
+    int color_swap[8] = { 1, 2, 4, 3, 0, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[18]];
     result.edges[1] = color_swap[other->edges[19]];
     result.edges[2] = color_swap[other->edges[16]];
@@ -1585,7 +1585,7 @@ cube r_3(cube *other) {
 
 cube l_1(cube *other) {
     cube result;
-    int color_swap[7] = { 1, 2, 4, 3, 0, 5, 6 };
+    int color_swap[8] = { 1, 2, 4, 3, 0, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[18]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[16]];
@@ -1639,7 +1639,7 @@ cube l_1(cube *other) {
 
 cube l_2(cube *other) {
     cube result;
-    int color_swap[7] = { 2, 4, 0, 3, 1, 5, 6 };
+    int color_swap[8] = { 2, 4, 0, 3, 1, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[8]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[10]];
@@ -1693,7 +1693,7 @@ cube l_2(cube *other) {
 
 cube l_3(cube *other) {
     cube result;
-    int color_swap[7] = { 4, 0, 1, 3, 2, 5, 6 };
+    int color_swap[8] = { 4, 0, 1, 3, 2, 5, 6, 7 };
     result.edges[0] = color_swap[other->edges[4]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[6]];
@@ -1747,7 +1747,7 @@ cube l_3(cube *other) {
 
 cube u_1(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 5, 2, 1, 3, 4, 6 };
+    int color_swap[8] = { 0, 5, 2, 1, 3, 4, 6, 7 };
     result.edges[0] = color_swap[other->edges[3]];
     result.edges[1] = color_swap[other->edges[0]];
     result.edges[2] = color_swap[other->edges[1]];
@@ -1801,7 +1801,7 @@ cube u_1(cube *other) {
 
 cube u_2(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 4, 2, 5, 1, 3, 6 };
+    int color_swap[8] = { 0, 4, 2, 5, 1, 3, 6, 7 };
     result.edges[0] = color_swap[other->edges[2]];
     result.edges[1] = color_swap[other->edges[3]];
     result.edges[2] = color_swap[other->edges[0]];
@@ -1855,7 +1855,7 @@ cube u_2(cube *other) {
 
 cube u_3(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 3, 2, 4, 5, 1, 6 };
+    int color_swap[8] = { 0, 3, 2, 4, 5, 1, 6, 7 };
     result.edges[0] = color_swap[other->edges[1]];
     result.edges[1] = color_swap[other->edges[2]];
     result.edges[2] = color_swap[other->edges[3]];
@@ -1909,7 +1909,7 @@ cube u_3(cube *other) {
 
 cube d_1(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 3, 2, 4, 5, 1, 6 };
+    int color_swap[8] = { 0, 3, 2, 4, 5, 1, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -1963,7 +1963,7 @@ cube d_1(cube *other) {
 
 cube d_2(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 4, 2, 5, 1, 3, 6 };
+    int color_swap[8] = { 0, 4, 2, 5, 1, 3, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -2017,7 +2017,7 @@ cube d_2(cube *other) {
 
 cube d_3(cube *other) {
     cube result;
-    int color_swap[7] = { 0, 5, 2, 1, 3, 4, 6 };
+    int color_swap[8] = { 0, 5, 2, 1, 3, 4, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[1]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -2071,7 +2071,7 @@ cube d_3(cube *other) {
 
 cube f_1(cube *other) {
     cube result;
-    int color_swap[7] = { 3, 1, 5, 2, 4, 0, 6 };
+    int color_swap[8] = { 3, 1, 5, 2, 4, 0, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[20]];
     result.edges[2] = color_swap[other->edges[21]];
@@ -2125,7 +2125,7 @@ cube f_1(cube *other) {
 
 cube f_2(cube *other) {
     cube result;
-    int color_swap[7] = { 2, 1, 0, 5, 4, 3, 6 };
+    int color_swap[8] = { 2, 1, 0, 5, 4, 3, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[11]];
     result.edges[2] = color_swap[other->edges[8]];
@@ -2179,7 +2179,7 @@ cube f_2(cube *other) {
 
 cube f_3(cube *other) {
     cube result;
-    int color_swap[7] = { 5, 1, 3, 0, 4, 2, 6 };
+    int color_swap[8] = { 5, 1, 3, 0, 4, 2, 6, 7 };
     result.edges[0] = color_swap[other->edges[0]];
     result.edges[1] = color_swap[other->edges[14]];
     result.edges[2] = color_swap[other->edges[15]];
@@ -2233,7 +2233,7 @@ cube f_3(cube *other) {
 
 cube b_1(cube *other) {
     cube result;
-    int color_swap[7] = { 5, 1, 3, 0, 4, 2, 6 };
+    int color_swap[8] = { 5, 1, 3, 0, 4, 2, 6, 7 };
     result.edges[0] = color_swap[other->edges[13]];
     result.edges[1] = color_swap[other->edges[14]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -2287,7 +2287,7 @@ cube b_1(cube *other) {
 
 cube b_2(cube *other) {
     cube result;
-    int color_swap[7] = { 2, 1, 0, 5, 4, 3, 6 };
+    int color_swap[8] = { 2, 1, 0, 5, 4, 3, 6, 7 };
     result.edges[0] = color_swap[other->edges[10]];
     result.edges[1] = color_swap[other->edges[11]];
     result.edges[2] = color_swap[other->edges[2]];
@@ -2341,7 +2341,7 @@ cube b_2(cube *other) {
 
 cube b_3(cube *other) {
     cube result;
-    int color_swap[7] = { 3, 1, 5, 2, 4, 0, 6 };
+    int color_swap[8] = { 3, 1, 5, 2, 4, 0, 6, 7 };
     result.edges[0] = color_swap[other->edges[23]];
     result.edges[1] = color_swap[other->edges[20]];
     result.edges[2] = color_swap[other->edges[2]];
