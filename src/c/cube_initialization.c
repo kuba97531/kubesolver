@@ -185,8 +185,8 @@ cube add_missing_edges_permutation(cube c) {
     for (int i=0; i<24; i+=2) {
         if (c.edges[edges[i]] == NO_STICKER) {
             int epi = edge_permutation_index++;
-            if (epi >= 6) {
-                printf("ERROR: can't add more than 6 edges permutation due to implementation detail");
+            if (epi >= 8) {
+                printf("ERROR: can't add more than 8 edges permutation due to implementation detail");
                 exit(1);
             }
             for (int k=0; k<2; k++) {
