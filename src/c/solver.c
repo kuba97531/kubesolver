@@ -614,6 +614,9 @@ int main(int argc, char* argv[]) {
         else if (!strcmp(buffer,"add_edges_orientation")) { 
             starting_position = attempted_position = add_missing_edges_orientation(starting_position);
         }
+        else if (!strcmp(buffer,"add_edges_permutation")) { 
+            starting_position = attempted_position = add_missing_edges_permutation(starting_position);
+        }
         else if (!strcmp(buffer,"add_edges")) { 
             starting_position = attempted_position = add_missing_edges(starting_position);
         }

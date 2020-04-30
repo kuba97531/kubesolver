@@ -27,6 +27,10 @@ cube add_missing_corner_permutation(cube c);
  */
 cube add_missing_edges_orientation(cube c);
 /**
+ * Adds permutation stickers to edges which aren't stickered yet. (These edges have to be solved in the right position but not orientation)
+ */
+cube add_missing_edges_permutation(cube c);
+/**
  * Adds all stickers to edges.
  */
 cube add_missing_edges(cube c);
