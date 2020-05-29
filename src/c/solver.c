@@ -524,7 +524,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    info("KubeSolver 1.0.3 (C) Jakub Straszewski 2020");
+    info("KubeSolver 1.0.4 (C) Jakub Straszewski 2020");
 
     if (max_depth != 22) {
         info("Setting max search depth to %d moves.\n", max_depth);
