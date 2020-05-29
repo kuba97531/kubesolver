@@ -1,3 +1,7 @@
+1.0.4 8d9c540 (29.5.2020)
+- Fixed a bug causing crashes when corner orientation was used together with wide moves.
+- add "add_edges_permutation"
+
 1.0.3 (19.04.2020)
 ==================
 - add init_to_current_state command
