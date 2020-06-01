@@ -43,27 +43,6 @@ void print_mask(__uint128_t t) {
     printf("\n");
 }
 
-void check_packing(cube c, int8_t last_move)
-{
-    cube other_c;
-    int8_t unpacked_last_move;
-
-    __uint128_t packed = pack_ce(&c, last_move);
-    unpack_ce(&other_c, &unpacked_last_move, packed);
-
-
-    if (cube_compare(&c, &other_c) != 0) {
-        link(&other_c, "print"); 
-        printf("WRONG pack of cube\n");
-        exit(0);
-    }
-    else {
-        //printf("ok pack\n");
-    }
-    if (last_move != unpacked_last_move) {
-        printf("WRONG pack of cube last_move\n");
-    }
-}
 
 void assert_sorted(solver_cube_packed *a, int from, int size) {
     for (int i= from; i<from + size - 1; i++) {
@@ -82,7 +61,6 @@ void sort_cubes(solver_cube_packed* arr, int from, int to)
     qsort(arr + from, to - from, sizeof(solver_cube_packed), solver_cube_compare);
     assert_sorted(arr, from, to-from);
 }
-
 
 // e.g. R and R'
 int is_sister_rotation(int r1, int r2) {

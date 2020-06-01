@@ -20,4 +20,6 @@ void unpack_ce(cube *c, int8_t *last_move, __uint128_t compressed);
 __uint128_t pack_ce (cube *c, int8_t last_move);
 
 int8_t unpack_last_move(__uint128_t compressed);
+
+void check_packing(cube c, int8_t last_move);
 #endif

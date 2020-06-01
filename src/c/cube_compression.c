@@ -1,6 +1,8 @@
 #include "cube3.h"
 #include "cube3r.h"
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #define UNPACK_DIM_LEN 8
@@ -91,5 +93,25 @@ __uint128_t pack_ce (cube *c, int8_t last_move) {
     return retVal;
 }
 
+void check_packing(cube c, int8_t last_move)
+{
+    cube other_c;
+    int8_t unpacked_last_move;
 
-    
+    __uint128_t packed = pack_ce(&c, last_move);
+    unpack_ce(&other_c, &unpacked_last_move, packed);
+
+
+    if (cube_compare(&c, &other_c) != 0) {
+        link(&other_c, "print"); 
+        printf("WRONG pack of cube\n");
+        exit(0);
+    }
+    else {
+        //printf("ok pack\n");
+    }
+    if (last_move != unpacked_last_move) {
+        printf("WRONG pack of cube last_move\n");
+        exit(0);
+    }
+}
