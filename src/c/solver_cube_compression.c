@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "cube_compression.h"
+#include "solver_cube_compression.h"
 
 #define UNPACK_DIM_LEN 8
 
@@ -152,6 +152,11 @@ void assert_sorted(solver_cube_packed *a, int from, int size) {
             fprintf(stderr, "SORTING FAILURE\n");
             exit(0);
             return;
+        }
+        else {
+            if (compare_packed_cubes_full(a+i, a + i+1) > 0 && i < 6000) {
+                printf("here we have to similar items: %d and %d\n", i, i+1 );
+            }
         }
     }
 }

@@ -78,7 +78,7 @@ SRC_FILES = \
  cube3.c\
  cube3r.c\
  cube_initialization.c\
- cube_compression.c\
+ solver_cube_compression.c\
  util.c\
  solver_growing_cache.c\
  solver_io.c

@@ -7,10 +7,10 @@
 
 #include "cube3.h"
 #include "cube3r.h"
-#include "cube_compression.h"
 #include "cube_initialization.h"
 #include "util.h"
 #include "solver_io.h"
+#include "solver_cube_compression.h"
 #include "solver_growing_cache.h"
 
 // e.g. R and R'

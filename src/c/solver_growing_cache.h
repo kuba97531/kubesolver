@@ -1,4 +1,4 @@
-#include"cube_compression.h"
+#include "solver_cube_compression.h"
 #ifndef SOLVER_GROWING_CACHE
 #define SOLVER_GROWING_CACHE
 
