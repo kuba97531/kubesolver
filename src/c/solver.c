@@ -13,55 +13,6 @@
 #include "solver_io.h"
 #include "solver_growing_cache.h"
 
-
-int solver_cube_compare(const void *s1, const void *s2)
-{
-    __uint128_t p1 = ((solver_cube_packed *)s1)->packed >> 8;
-    __uint128_t p2 = ((solver_cube_packed *)s2)->packed >> 8;
-    if (p1 > p2) {
-        return 1;
-    }
-    else if (p2 > p1) {
-        return -1;
-    }
-    return 0;
-}
-
-void print_mask(__uint128_t t) {
-    __uint128_t one = 1;
-    for (int i=0; i< 40*3; i++) {
-        if (t & ( one << i)) {
-            printf("X");
-        }
-        else {
-            printf("_");
-        }
-        if (i%3 == 2) {
-        printf(" ");
-        }
-    }
-    printf("\n");
-}
-
-
-void assert_sorted(solver_cube_packed *a, int from, int size) {
-    for (int i= from; i<from + size - 1; i++) {
-        if (solver_cube_compare(a+i, a + i+1) > 0 )
-        {
-            printf("SORTING FAILURE at i = %d\n", i);
-            fprintf(stderr, "SORTING FAILURE\n");
-            exit(0);
-            return;
-        }
-    }
-}
-
-void sort_cubes(solver_cube_packed* arr, int from, int to) 
-{
-    qsort(arr + from, to - from, sizeof(solver_cube_packed), solver_cube_compare);
-    assert_sorted(arr, from, to-from);
-}
-
 // e.g. R and R'
 int is_sister_rotation(int r1, int r2) {
     return r1 / 3 == r2 / 3;
@@ -86,7 +37,7 @@ int is_forbidden_pair(int r1, int r2, int direction) {
 int remove_duplicates(solver_cube_packed* arr, int from, int to) {
     int last_unique = from;
     for (int i = from + 1; i<to; i++ ) {
-        if (solver_cube_compare(arr + last_unique, arr + i) != 0) {
+        if (compare_packed_cubes_full(arr + last_unique, arr + i) != 0) {
             arr[++last_unique] = arr[i];
         }
     }
@@ -119,14 +70,6 @@ int generate_new_level(growing_cache* cache, int level_start, int level_end, int
     }
     sort_cubes(cache->array, level_end, new_level_end);
 
-    for (int i= level_end; i<new_level_end - 1; i++) {
-        if (solver_cube_compare(cache->array + i, cache->array + i+1) > 0 )
-        {
-            printf("SORTING FAILURE at i = %d\n", i);
-            fprintf(stderr, "SORTING FAILURE\n");
-            return -1;
-        }
-    }
     level_end = remove_duplicates(cache->array, level_start, new_level_end);
     cache->used = level_end;
     return level_end;
@@ -143,7 +86,7 @@ int find_index_in_cache_level(solver_cube_packed* array, int left, int right, so
     assert(left < right);
     while (left + 1 < right) {
         int middle = (left + right)/2;
-        int cmp = solver_cube_compare(array + middle, element);
+        int cmp = compare_packed_cubes_only_cube_state(array + middle, element);
         if (cmp == 0 ) {
             return middle;
         }
@@ -154,14 +97,14 @@ int find_index_in_cache_level(solver_cube_packed* array, int left, int right, so
         }
     }
 
-    if (solver_cube_compare(array + left, element) == 0) {
-        //should always be true
+    if (compare_packed_cubes_only_cube_state(array + left, element) == 0) {
+        //should always be true. we don't simply assert it to be more precise in bug report.
         return left;
     }
     
     printf("ERROR! find didn't find a sequence between %d and %d!\n", left, right);
     for (int i = left; i<right; i++) {
-        int cmp = solver_cube_compare(array + i, element);
+        int cmp = compare_packed_cubes_only_cube_state(array + i, element);
         if (cmp ==0 ) {
             printf("but should have found %d\n", i);
         }
@@ -251,7 +194,7 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
     int cc_level_start = ff;
     int sequences_found = 0;
     while (f < t && ff < tt) {
-        int cmp = solver_cube_compare(c + f, cc + ff);
+        int cmp = compare_packed_cubes_only_cube_state(c + f, cc + ff);
         if (cmp == 0) {
             int left_count = 0;
             int left_array[60];

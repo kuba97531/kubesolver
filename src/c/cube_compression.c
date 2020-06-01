@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "cube_compression.h"
 
 #define UNPACK_DIM_LEN 8
 
@@ -114,4 +115,49 @@ void check_packing(cube c, int8_t last_move)
         printf("WRONG pack of cube last_move\n");
         exit(0);
     }
+}
+
+
+int compare_packed_cubes_only_cube_state(const void *s1, const void *s2)
+{
+    __uint128_t p1 = ((solver_cube_packed *)s1)->packed >> 8;
+    __uint128_t p2 = ((solver_cube_packed *)s2)->packed >> 8;
+    if (p1 > p2) {
+        return 1;
+    }
+    else if (p2 > p1) {
+        return -1;
+    }
+    return 0;
+}
+
+int compare_packed_cubes_full(const void *s1, const void *s2)
+{
+    __uint128_t p1 = ((solver_cube_packed *)s1)->packed;
+    __uint128_t p2 = ((solver_cube_packed *)s2)->packed;
+    if (p1 > p2) {
+        return 1;
+    }
+    else if (p2 > p1) {
+        return -1;
+    }
+    return 0;
+}
+
+void assert_sorted(solver_cube_packed *a, int from, int size) {
+    for (int i= from; i<from + size - 1; i++) {
+        if (compare_packed_cubes_only_cube_state(a+i, a + i+1) > 0 )
+        {
+            printf("SORTING FAILURE at i = %d\n", i);
+            fprintf(stderr, "SORTING FAILURE\n");
+            exit(0);
+            return;
+        }
+    }
+}
+
+void sort_cubes(solver_cube_packed* arr, int from, int to) 
+{
+    qsort(arr + from, to - from, sizeof(solver_cube_packed), compare_packed_cubes_only_cube_state);
+    assert_sorted(arr, from, to-from);
 }
