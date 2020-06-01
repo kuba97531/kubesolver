@@ -484,7 +484,6 @@ void solve(cube* c, cube* cc, int levels, int max_number_of_output_sequences){
         return;
 }
 
-
 int main(int argc, char* argv[]) {
     set_all_rotations();
     initialize_cube_compression();
@@ -495,6 +494,7 @@ int main(int argc, char* argv[]) {
     char buffer[100];
     int max_number_of_output_sequences = 1000000;
     int max_depth = 22;
+    int max_extra_depth = 22;
 
     int applied_rotations[10000];
     int applied_rotations_n = 0;
@@ -564,6 +564,38 @@ int main(int argc, char* argv[]) {
              check_packing(attempted_position, 17);
              printf("\n");
              }
+        else if (!strcmp(buffer,"set")) {
+            int scan_result = scanf(" %s", buffer);
+            if (scan_result == 0) {
+                printf("ERROR: missing argument to set\n");
+                exit(1);
+            }
+            if (!strcmp(buffer,"d") || !(strcmp(buffer,"max-depth-of-search"))){
+                scan_result = scanf(" %d", &max_depth);
+                if (scan_result == 0) {
+                    printf("ERROR: wrong argument to set max-depth-of-search\n");
+                    exit(1);
+                }
+                info("Setting max search depth to %d moves.\n", max_depth);
+            }
+            if (!strcmp(buffer,"da") || !(strcmp(buffer,"max-additional-depth-of-search"))){
+                scan_result = scanf(" %d", &max_extra_depth);
+                if (scan_result == 0) {
+                    printf("ERROR: wrong argument to set max-additional-depth-of-search\n");
+                    exit(1);
+                }
+                info("Will search sequences longer by at most %d moves than the shortest sequence.\n", max_depth);
+            }
+            else if (!strcmp(buffer,"n") || !(strcmp(buffer,"max-number-of-sequences"))){
+                scan_result = scanf(" %d", &max_number_of_output_sequences);
+                if (scan_result == 0) {
+                    printf("ERROR: wrong argument to set\n");
+                    exit(1);
+                }
+                info("Setting max number of output sequences to %d.\n", max_number_of_output_sequences);
+            }
+
+        }
         else if (!strcmp(buffer,"set_gen")) { 
             int scan_result = scanf(" %s", buffer);
             if (scan_result == 0) {
