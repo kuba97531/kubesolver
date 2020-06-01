@@ -11,34 +11,8 @@
 #include "cube_initialization.h"
 #include "util.h"
 #include "solver_io.h"
+#include "solver_growing_cache.h"
 
-typedef struct {
-  solver_cube_packed *array;
-  uint64_t used;
-  uint64_t size;
-} growing_cache;
-
-const int initial_cache_size = 1024*16;
-
-void init(growing_cache* cache) {
-    cache->array = malloc(initial_cache_size * sizeof(solver_cube_packed));
-    cache->used = 0;
-    cache->size = initial_cache_size;
-}
-
-void resize(growing_cache* cache) {
-    if (cache->used > cache->size - 1) {
-        uint64_t new_size = cache->size * 2;
-        //info("regrowing cache to %d, as it's too small", new_size);
-        solver_cube_packed* bigger = realloc(cache->array, new_size * sizeof(solver_cube_packed));
-        if (bigger == NULL) {
-            printf("ERROR: not enough memory\n");
-            exit(0);
-        }
-        cache->size = cache->size * 2;
-        cache->array = bigger;
-    }
-}
 
 int solver_cube_compare(const void *s1, const void *s2)
 {
@@ -162,7 +136,7 @@ int generate_new_level(growing_cache* cache, int level_start, int level_end, int
             cache->array[new_level_end].packed = pack_ce(&rotated, rotation);
             new_level_end++;
             cache->used = new_level_end;
-            resize(cache);
+            resize_growing_cache(cache);
         }
     }
     sort_cubes(cache->array, level_end, new_level_end);
@@ -344,8 +318,8 @@ void solve_single_phase(int out_sequence[], int* out_sequence_len, cube* c, cube
     growing_cache cache_c;
     growing_cache cache_cc;
 
-    init(&cache_c);
-    init(&cache_cc);
+    init_growing_cache(&cache_c);
+    init_growing_cache(&cache_cc);
     
     cache_c.array[0].packed = pack_ce(c, 0);
     cache_cc.array[0].packed = pack_ce(cc, 0);
@@ -417,8 +391,8 @@ void solve(cube* c, cube* cc, int levels, int max_number_of_output_sequences){
     growing_cache cache_c;
     growing_cache cache_cc;
 
-    init(&cache_c);
-    init(&cache_cc);
+    init_growing_cache(&cache_c);
+    init_growing_cache(&cache_cc);
     
     cache_c.array[0].packed = pack_ce(c, 0);
     cache_cc.array[0].packed = pack_ce(cc, 0);

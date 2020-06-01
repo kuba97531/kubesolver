@@ -80,6 +80,7 @@ SRC_FILES = \
  cube_initialization.c\
  cube_compression.c\
  util.c\
+ solver_growing_cache.c\
  solver_io.c
 
 SRC_ALWAYS_REBUILD_FILES = \
