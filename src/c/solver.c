@@ -12,18 +12,6 @@
 #include "util.h"
 #include "solver_io.h"
 
-typedef struct 
-{
-    __uint128_t packed; 
-} solver_cube_packed;
-
-typedef struct 
-{
-    cube cube; 
-    int8_t last_move;
-} solver_cube_unpacked;
-
-
 typedef struct {
   solver_cube_packed *array;
   uint64_t used;

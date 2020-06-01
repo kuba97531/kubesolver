@@ -3,6 +3,17 @@
 #ifndef CUBE_COMPRESION
 #define CUBE_COMPRESION
 
+typedef struct 
+{
+    __uint128_t packed; 
+} solver_cube_packed;
+
+typedef struct 
+{
+    cube cube; 
+    int8_t last_move;
+} solver_cube_unpacked;
+
 void initialize_cube_compression(void);
 
 void unpack_ce(cube *c, int8_t *last_move, __uint128_t compressed);
