@@ -84,12 +84,18 @@ int reverse_rotation(int rotation_id) {
 int find_index_in_cache_level(solver_cube_packed* array, int left, int right, solver_cube_packed* element) {
     assert(left >=0);
     assert(left < right);
+    
+    if (compare_packed_cubes_only_cube_state(array + left, element) == 0) {
+        //we should return the first element on the list that matches.
+        return left;
+    }
+
+    //now we know that left < element, and right >= element and we will keep this as new invariant.
+    //this will guarantee that when the search is over we can return right.
+
     while (left + 1 < right) {
         int middle = (left + right)/2;
         int cmp = compare_packed_cubes_only_cube_state(array + middle, element);
-        if (cmp == 0 ) {
-            return middle;
-        }
         if (cmp < 0) {
             left = middle;
         } else {
@@ -97,19 +103,11 @@ int find_index_in_cache_level(solver_cube_packed* array, int left, int right, so
         }
     }
 
-    if (compare_packed_cubes_only_cube_state(array + left, element) == 0) {
-        //should always be true. we don't simply assert it to be more precise in bug report.
-        return left;
+    if (compare_packed_cubes_only_cube_state(array + right, element) != 0) {
+        printf("Internal assertion failed! Couldn't restore the move sequence.!\n", left, right);
+        exit(0);
     }
-    
-    printf("ERROR! find didn't find a sequence between %d and %d!\n", left, right);
-    for (int i = left; i<right; i++) {
-        int cmp = compare_packed_cubes_only_cube_state(array + i, element);
-        if (cmp ==0 ) {
-            printf("but should have found %d\n", i);
-        }
-    }
-    exit(0);
+    return right;
 }
 
 void set_3gen(char* chs)
@@ -196,33 +194,44 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
     while (f < t && ff < tt) {
         int cmp = compare_packed_cubes_only_cube_state(c + f, cc + ff);
         if (cmp == 0) {
-            int left_count = 0;
-            int left_array[60];
-            find_cache_sequence(&left_count, left_array, c, c_level_start, f);
-            int right_count = 0;
-            int right_array[30];
-            find_cache_sequence(&right_count, right_array, cc, cc_level_start, ff);
-            reverse_and_merge_into_first(left_count, left_array, right_count, right_array);
-            if (!is_forbidden_sequence(left_count + right_count, left_array, 1)) {
-                if (out_sequence != NULL && out_sequence_len != NULL) {
-                    *out_sequence_len = left_count + right_count;
-                    for (int i=0; i< left_count + right_count;i++) 
-                    { 
-                        out_sequence[i] = left_array[i];
+            int af = f;
+            int aff = ff;
+            while (af < t && compare_packed_cubes_only_cube_state(c + f, c + af) == 0) {
+                af++;
+            }
+            while (aff < tt && compare_packed_cubes_only_cube_state(cc + ff, cc + aff) == 0) {
+                aff++;
+            }
+            for (int _f = f; _f < af; _f++) 
+            for (int _ff = ff; _ff < aff; _ff++) {
+                int left_count = 0;
+                int left_array[60];
+                find_cache_sequence(&left_count, left_array, c, c_level_start, _f);
+                int right_count = 0;
+                int right_array[30];
+                find_cache_sequence(&right_count, right_array, cc, cc_level_start, _ff);
+                reverse_and_merge_into_first(left_count, left_array, right_count, right_array);
+                if (!is_forbidden_sequence(left_count + right_count, left_array, 1)) {
+                    if (out_sequence != NULL && out_sequence_len != NULL) {
+                        *out_sequence_len = left_count + right_count;
+                        for (int i=0; i< left_count + right_count;i++) 
+                        { 
+                            out_sequence[i] = left_array[i];
+                        }
+                    }
+                    if (print_sequences) {
+                        print_sequence(left_count + right_count, left_array);
+                        printf("\n");
+                        fflush(stdout);
+                    }
+                    sequences_found++;
+                    if (sequences_found >= max_number_of_output_sequences) {
+                        return sequences_found;
                     }
                 }
-                if (print_sequences) {
-                    print_sequence(left_count + right_count, left_array);
-                    printf("\n");
-                    fflush(stdout);
-                }
-                sequences_found++;
-                if (sequences_found >= max_number_of_output_sequences) {
-                    return sequences_found;
-                }
             }
-            f++;
-            ff++;
+            f = af;
+            ff = aff;
         }
         else  if (cmp < 0)
         {
