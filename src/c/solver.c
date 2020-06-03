@@ -317,62 +317,63 @@ void solve_two_phase(int input_sequence[], int input_sequence_len, int levels)
     printf("\n");
 }
 
-void solve(cube* c, cube* cc, int levels, int max_number_of_output_sequences){
-    growing_cache cache_c;
-    growing_cache cache_cc;
+typedef struct {
+    int max_number_of_output_sequences;
+    int max_depth_after_find;
+    int max_depth;
+} solve_settings;
 
-    init_growing_cache(&cache_c);
-    init_growing_cache(&cache_cc);
+typedef struct {
+    growing_cache cache;
+    int level_start;
+    int level_end;
+} solve_local_items;
+
+void solve(cube* c, cube* cc, solve_settings settings){
+
+    solve_local_items items[2];
     
-    cache_c.array[0].packed = pack_ce(c, 0);
-    cache_cc.array[0].packed = pack_ce(cc, 0);
-    
-    int level_start_c = 0;
-    int level_end_c = 1;
-
-    int level_start_cc = 0;
-    int level_end_cc = 1;
-
-    int level_c = 0;
-    int level_cc = 0;
+    for (int i=0; i<2; i++) {
+        init_growing_cache(&(items[i].cache));
+        items[i].level_start = 0;
+        items[i].level_end = 1;
+    }
+    items[0].cache.array[0].packed = pack_ce(c, 0);
+    items[1].cache.array[0].packed = pack_ce(cc, 0);
 
     int sequences_found = 0;
 
+    int levels = 0;
     while(1) {
-        cache_c.array[level_end_c].packed = level_start_c;
-        int new_level_end = generate_new_level(&cache_c, level_start_c, level_end_c, level_end_c + 1, 1);
+        int current_cache_id = levels % 2;
+        items[current_cache_id].cache.array[items[current_cache_id].level_end].packed = items[current_cache_id].level_start;
 
-        level_start_c = level_end_c + 1;
-        level_end_c = new_level_end;
-        level_c++;
-        info("Searching %d move solutions...", level_c + level_cc);
+        int new_level_end = generate_new_level(&items[current_cache_id].cache, items[current_cache_id].level_start, items[current_cache_id].level_end, items[current_cache_id].level_end + 1, 1);
 
-        sequences_found += find_sequence(NULL, NULL, cache_c.array, level_start_c, level_end_c , cache_cc.array, level_start_cc, level_end_cc, max_number_of_output_sequences - sequences_found, 1);
-        if (sequences_found >= max_number_of_output_sequences) {
+        items[current_cache_id].level_start = items[current_cache_id].level_end + 1;
+        items[current_cache_id].level_end = new_level_end;
+        levels++;
+        info("Searching %d move solutions...", levels);
+
+        sequences_found += find_sequence(NULL, NULL, 
+                                        items[0].cache.array, items[0].level_start, items[0].level_end, 
+                                        items[1].cache.array, items[1].level_start, items[1].level_end, 
+                                        settings.max_number_of_output_sequences - sequences_found, 1);
+        if (sequences_found >= settings.max_number_of_output_sequences) {
             goto SOLVE_FINALLY;
         }
-
-        if (level_c + level_cc >= levels) {
+        if (sequences_found > 0 && settings.max_depth_after_find >= 0 && levels + settings.max_depth_after_find < settings.max_depth) {
+            settings.max_depth = levels + settings.max_depth_after_find;
+        }
+        if (levels >= settings.max_depth) {
             goto SOLVE_FINALLY;
         }
-
-        cache_cc.array[level_end_cc].packed = level_start_cc;
-        new_level_end = generate_new_level(&cache_cc, level_start_cc, level_end_cc, level_end_cc+1, -1);
-        level_start_cc = level_end_cc + 1;
-        level_end_cc = new_level_end;
-        level_cc++;
-        info("Searching %d move solutions...", level_c + level_cc );
-        sequences_found += find_sequence(NULL, NULL, cache_c.array, level_start_c, level_end_c , cache_cc.array, level_start_cc, level_end_cc, max_number_of_output_sequences - sequences_found, 1);
-        if (sequences_found >= max_number_of_output_sequences) {
-            goto SOLVE_FINALLY;
-        }
-        if (level_c + level_cc >= levels) {
-            goto SOLVE_FINALLY;
-        }
+        current_cache_id = 1 - current_cache_id;
     }
     SOLVE_FINALLY:
-        free(cache_c.array);
-        free(cache_cc.array);
+        for (int i=0; i<2; i++) {
+            free(items[i].cache.array);
+        }
         return;
 }
 
@@ -384,9 +385,11 @@ int main(int argc, char* argv[]) {
     cube attempted_position = full_cube();
 
     char buffer[100];
-    int max_number_of_output_sequences = 1000000;
-    int max_depth = 22;
-    int max_extra_depth = 22;
+    solve_settings settings = {
+        .max_depth = 22,
+        .max_number_of_output_sequences = 1000000,
+        .max_depth_after_find = -1
+    };
 
     int applied_rotations[10000];
     int applied_rotations_n = 0;
@@ -396,20 +399,30 @@ int main(int argc, char* argv[]) {
         if (!strcmp(arg,"--silent")) {
             disable_info_messages();
         } else if (!strcmp(arg,"--max-number-of-sequences") || !strcmp(arg,"-n")) {
-            int scanf_result = sscanf(argv[++i], "%d", &max_number_of_output_sequences);
+            int scanf_result = sscanf(argv[++i], "%d", &settings.max_number_of_output_sequences);
             if (!scanf_result) 
             {
                 printf("ERROR: invalid argument to %s (%s).\n", arg, argv[i]);
                 exit(1);
             }
         } else if (!strcmp(arg,"--max-depth-of-search") || !strcmp(arg,"-d")) {
-            int scanf_result = sscanf(argv[++i], "%d", &max_depth);
+            int scanf_result = sscanf(argv[++i], "%d", &settings.max_depth);
+            if (!scanf_result) 
+            {
+                printf("ERROR: invalid argument to %s (%s).\n", arg, argv[i]);
+                exit(1);
+            }
+        } else if (!strcmp(arg,"--max-depth-after-first-match") || !strcmp(arg,"-da")) {
+            int scanf_result = sscanf(argv[++i], "%d", &settings.max_depth_after_find);
             if (!scanf_result) 
             {
                 printf("ERROR: invalid argument to %s (%s).\n", arg, argv[i]);
                 exit(1);
             }
         }
+
+
+
         else {
             printf("ERROR: unknown argument %s.\n", arg);
             exit(1);
@@ -418,12 +431,16 @@ int main(int argc, char* argv[]) {
 
     info("KubeSolver 1.0.4 (C) Jakub Straszewski 2020");
 
-    if (max_depth != 22) {
-        info("Setting max search depth to %d moves.\n", max_depth);
+    if (settings.max_depth != 22) {
+        info("Setting max search depth to %d moves.\n", settings.max_depth);
     }
-    if (max_number_of_output_sequences != 1000000) {
-        info("Setting max number of output sequences to %d.\n", max_number_of_output_sequences);
+    if (settings.max_number_of_output_sequences != INT_MAX) {
+        info("Setting max number of output sequences to %d.\n", settings.max_number_of_output_sequences);
     }
+    if (settings.max_depth_after_find != -1) {
+        info("Setting additional depth search after first find to %d.\n", settings.max_depth_after_find);
+    }
+
     while (scanf("%s", buffer) != EOF) {
         //apply rotation
         int found = 0;
@@ -463,28 +480,28 @@ int main(int argc, char* argv[]) {
                 exit(1);
             }
             if (!strcmp(buffer,"d") || !(strcmp(buffer,"max-depth-of-search"))){
-                scan_result = scanf(" %d", &max_depth);
+                scan_result = scanf(" %d", &settings.max_depth);
                 if (scan_result == 0) {
                     printf("ERROR: wrong argument to set max-depth-of-search\n");
                     exit(1);
                 }
-                info("Setting max search depth to %d moves.\n", max_depth);
+                info("Setting max search depth to %d moves.\n", settings.max_depth);
             }
-            if (!strcmp(buffer,"da") || !(strcmp(buffer,"max-additional-depth-of-search"))){
-                scan_result = scanf(" %d", &max_extra_depth);
+            if (!strcmp(buffer,"da") || !(strcmp(buffer,"max-depth-after-first-match"))){
+                scan_result = scanf(" %d", &settings.max_depth_after_find);
                 if (scan_result == 0) {
                     printf("ERROR: wrong argument to set max-additional-depth-of-search\n");
                     exit(1);
                 }
-                info("Will search sequences longer by at most %d moves than the shortest sequence.\n", max_depth);
+                info("Will search sequences longer by at most %d moves than the shortest found sequence.\n", settings.max_depth);
             }
             else if (!strcmp(buffer,"n") || !(strcmp(buffer,"max-number-of-sequences"))){
-                scan_result = scanf(" %d", &max_number_of_output_sequences);
+                scan_result = scanf(" %d", &settings.max_number_of_output_sequences);
                 if (scan_result == 0) {
                     printf("ERROR: wrong argument to set\n");
                     exit(1);
                 }
-                info("Setting max number of output sequences to %d.\n", max_number_of_output_sequences);
+                info("Setting max number of output sequences to %d.\n", settings.max_number_of_output_sequences);
             }
 
         }
@@ -572,10 +589,10 @@ int main(int argc, char* argv[]) {
             starting_position = attempted_position = c;
         }
         else if (!strcmp(buffer,"solve")) { 
-            solve(&attempted_position, &starting_position, max_depth, max_number_of_output_sequences);
+            solve(&attempted_position, &starting_position, settings);
          }
          else if (!strcmp(buffer,"reconstruct")) { 
-            solve(&starting_position, &attempted_position, max_depth, max_number_of_output_sequences);
+            solve(&starting_position, &attempted_position, settings);
          }
          else if (!strcmp(buffer, "solve_two_phase")) {
              solve_two_phase(applied_rotations, applied_rotations_n, 11);
