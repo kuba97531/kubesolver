@@ -13,6 +13,8 @@
 #include "solver_cube_compression.h"
 #include "solver_growing_cache.h"
 
+#define MAX_SEQUENCE_LEN 22
+
 // e.g. R and R'
 int is_sister_rotation(int r1, int r2) {
     return r1 / 3 == r2 / 3;
@@ -142,9 +144,32 @@ void set_all_rotations(void) {
     }
 }
 
-void find_cache_sequence(int* out_sequence_len, int* out_sequence, solver_cube_packed* cache, int current_level_start, int original_item) {
-    if (original_item == 0 ) return;
-      
+typedef struct {
+    int sequence_len;
+    int sequences_count;
+    int sequences[MAX_SEQUENCE_LEN * 100];
+} list_of_sequences;
+
+void add_reverse_sequence(list_of_sequences* out_sequences, int sequence_len, int* reverse_sequence) {
+    if (out_sequences -> sequences_count == 0) {
+        out_sequences->sequence_len = sequence_len;
+    }
+    if (out_sequences->sequence_len != sequence_len) {
+        printf("ERROR. Bug found. Internal assertion failed! Found sequences of different length on the same level.!\n");
+        exit(1);
+    }
+    for (int i=0; i<sequence_len; i++) {
+        out_sequences->sequences[sequence_len * out_sequences->sequences_count + i] = reverse_sequence[sequence_len - 1 - i];
+    }
+    out_sequences->sequences_count += 1;
+}
+
+void find_cache_sequence(list_of_sequences* out_sequences, int* temp_reverse_sequence, int depth, solver_cube_packed* cache, int current_level_start, int original_item) {
+    if (original_item == 0) {
+        add_reverse_sequence(out_sequences, depth, temp_reverse_sequence);
+        return;
+    }
+    
     cube current_cube;
     int8_t last_move;
 
@@ -158,9 +183,12 @@ void find_cache_sequence(int* out_sequence_len, int* out_sequence, solver_cube_p
     int left = (int) cache[right].packed;
     assert(left >= 0);
     int index = find_index_in_cache_level(cache, left, right, &expected_parent);
-    find_cache_sequence(out_sequence_len, out_sequence, cache, left, index);
-    out_sequence[*out_sequence_len] = last_move;
-    (*out_sequence_len)++;
+    temp_reverse_sequence[depth] = last_move;
+
+    while (index <= right && compare_packed_cubes_only_cube_state(cache + index, &expected_parent) == 0) {
+        find_cache_sequence(out_sequences, temp_reverse_sequence, depth + 1, cache, left, index);
+        index++;
+    }
 }
 
 void print_sequence(int sequence_len, int sequence[]) {
@@ -204,29 +232,43 @@ int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed*
             }
             for (int _f = f; _f < af; _f++) 
             for (int _ff = ff; _ff < aff; _ff++) {
-                int left_count = 0;
-                int left_array[60];
-                find_cache_sequence(&left_count, left_array, c, c_level_start, _f);
-                int right_count = 0;
-                int right_array[30];
-                find_cache_sequence(&right_count, right_array, cc, cc_level_start, _ff);
-                reverse_and_merge_into_first(left_count, left_array, right_count, right_array);
-                if (!is_forbidden_sequence(left_count + right_count, left_array, 1)) {
-                    if (out_sequence != NULL && out_sequence_len != NULL) {
-                        *out_sequence_len = left_count + right_count;
-                        for (int i=0; i< left_count + right_count;i++) 
-                        { 
-                            out_sequence[i] = left_array[i];
+                int temp_array[MAX_SEQUENCE_LEN];
+                list_of_sequences left_sequences = { 0 };
+                list_of_sequences right_sequences = { 0 };
+                find_cache_sequence(&left_sequences, temp_array, 0, c, c_level_start, _f);
+                find_cache_sequence(&right_sequences, temp_array, 0, cc, cc_level_start, _ff);
+                if (left_sequences.sequences_count == 0 || right_sequences.sequences_count == 0) {
+                    printf("Internal assertion failed! It was impossible to reconstruct a sequence.\n");
+                    exit(1);
+                }
+                int sequence_len = left_sequences.sequence_len + right_sequences.sequence_len;
+                for (int left_index = 0; left_index < left_sequences.sequences_count; left_index ++) {
+                    for (int i=0; i< left_sequences.sequence_len; i++) {
+                        temp_array[i] = left_sequences.sequences[left_sequences.sequence_len * left_index + i];
+                    }
+                    for (int right_index = 0; right_index < right_sequences.sequences_count; right_index++) {
+                        reverse_and_merge_into_first(
+                            left_sequences.sequence_len, temp_array, 
+                            right_sequences.sequence_len, right_sequences.sequences + (right_index * right_sequences.sequence_len));
+
+                        if (!is_forbidden_sequence(sequence_len, temp_array, 1)) {
+                            if (out_sequence != NULL && out_sequence_len != NULL) {
+                                *out_sequence_len = sequence_len;
+                                for (int i=0; i< sequence_len;i++) 
+                                { 
+                                    out_sequence[i] = temp_array[i];
+                                }
+                            }
+                            if (print_sequences) {
+                                print_sequence(sequence_len, temp_array);
+                                printf("\n");
+                                fflush(stdout);
+                            }
+                            sequences_found++;
+                            if (sequences_found >= max_number_of_output_sequences) {
+                                return sequences_found;
+                            }
                         }
-                    }
-                    if (print_sequences) {
-                        print_sequence(left_count + right_count, left_array);
-                        printf("\n");
-                        fflush(stdout);
-                    }
-                    sequences_found++;
-                    if (sequences_found >= max_number_of_output_sequences) {
-                        return sequences_found;
                     }
                 }
             }
@@ -345,10 +387,11 @@ void solve(cube* c, cube* cc, solve_settings settings){
 
     int levels = 0;
     while(1) {
-        int current_cache_id = levels % 2;
+        int current_cache_id = levels % 2; // alternate between 0 and 1
+        int current_direction = 1 - 2 * current_cache_id; // alternate between 1 and -1
         items[current_cache_id].cache.array[items[current_cache_id].level_end].packed = items[current_cache_id].level_start;
 
-        int new_level_end = generate_new_level(&items[current_cache_id].cache, items[current_cache_id].level_start, items[current_cache_id].level_end, items[current_cache_id].level_end + 1, 1);
+        int new_level_end = generate_new_level(&items[current_cache_id].cache, items[current_cache_id].level_start, items[current_cache_id].level_end, items[current_cache_id].level_end + 1, current_direction);
 
         items[current_cache_id].level_start = items[current_cache_id].level_end + 1;
         items[current_cache_id].level_end = new_level_end;
@@ -386,7 +429,7 @@ int main(int argc, char* argv[]) {
 
     char buffer[100];
     solve_settings settings = {
-        .max_depth = 22,
+        .max_depth = MAX_SEQUENCE_LEN,
         .max_number_of_output_sequences = 1000000,
         .max_depth_after_find = -1
     };
@@ -412,6 +455,7 @@ int main(int argc, char* argv[]) {
                 printf("ERROR: invalid argument to %s (%s).\n", arg, argv[i]);
                 exit(1);
             }
+            settings.max_depth = MIN(settings.max_depth, MAX_SEQUENCE_LEN);
         } else if (!strcmp(arg,"--max-depth-after-first-match") || !strcmp(arg,"-da")) {
             int scanf_result = sscanf(argv[++i], "%d", &settings.max_depth_after_find);
             if (!scanf_result) 
@@ -419,11 +463,7 @@ int main(int argc, char* argv[]) {
                 printf("ERROR: invalid argument to %s (%s).\n", arg, argv[i]);
                 exit(1);
             }
-        }
-
-
-
-        else {
+        } else {
             printf("ERROR: unknown argument %s.\n", arg);
             exit(1);
         }
@@ -431,7 +471,7 @@ int main(int argc, char* argv[]) {
 
     info("KubeSolver 1.0.4 (C) Jakub Straszewski 2020");
 
-    if (settings.max_depth != 22) {
+    if (settings.max_depth < MAX_SEQUENCE_LEN) {
         info("Setting max search depth to %d moves.\n", settings.max_depth);
     }
     if (settings.max_number_of_output_sequences != INT_MAX) {
@@ -485,6 +525,7 @@ int main(int argc, char* argv[]) {
                     printf("ERROR: wrong argument to set max-depth-of-search\n");
                     exit(1);
                 }
+                settings.max_depth = MIN(settings.max_depth, MAX_SEQUENCE_LEN);
                 info("Setting max search depth to %d moves.\n", settings.max_depth);
             }
             if (!strcmp(buffer,"da") || !(strcmp(buffer,"max-depth-after-first-match"))){
