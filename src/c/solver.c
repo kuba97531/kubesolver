@@ -104,7 +104,7 @@ int find_index_in_cache_level(solver_cube_packed* array, int left, int right, so
     }
 
     if (compare_packed_cubes_only_cube_state(array + right, element) != 0) {
-        printf("Internal assertion failed! Couldn't restore the move sequence.!\n", left, right);
+        printf("Internal assertion failed! Couldn't restore the move sequence.!\n");
         exit(0);
     }
     return right;

@@ -105,14 +105,14 @@ void check_packing(cube c, int8_t last_move)
 
     if (cube_compare(&c, &other_c) != 0) {
         link(&other_c, "print"); 
-        printf("WRONG pack of cube\n");
+        printf("ERROR: Bug found, WRONG pack of cube\n");
         exit(0);
     }
     else {
         //printf("ok pack\n");
     }
     if (last_move != unpacked_last_move) {
-        printf("WRONG pack of cube last_move\n");
+        printf("ERROR: Bug found, WRONG pack of last move\n");
         exit(0);
     }
 }
@@ -148,15 +148,10 @@ void assert_sorted(solver_cube_packed *a, int from, int size) {
     for (int i= from; i<from + size - 1; i++) {
         if (compare_packed_cubes_only_cube_state(a+i, a + i+1) > 0 )
         {
-            printf("SORTING FAILURE at i = %d\n", i);
-            fprintf(stderr, "SORTING FAILURE\n");
+            printf("ERROR: Bug found,SORTING FAILURE at i = %d\n", i);
+            fprintf(stderr, "ERROR: Bug found, SORTING FAILURE\n");
             exit(0);
             return;
-        }
-        else {
-            if (compare_packed_cubes_full(a+i, a + i+1) > 0 && i < 6000) {
-                printf("here we have to similar items: %d and %d\n", i, i+1 );
-            }
         }
     }
 }
