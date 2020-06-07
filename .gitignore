@@ -2,3 +2,4 @@
 *.out
 *.html
 *.txt
+**/__pycache__

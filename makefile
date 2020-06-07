@@ -26,7 +26,6 @@ else
 endif
 
 BUILD   ?= DEBUG
-NAME    ?= makesolver
 CC       = gcc
 SRCDIR   = src/c
 
@@ -130,3 +129,8 @@ $(OBJ_REBUILD_FILES): $(OBJDIR)/%$(BUILD_POSTFIX).o: $(SRCDIR)/%.c
 	@$(CREATE_OBJ_DIR)
 	@$(CC) -c $(CC_OPTIONS) $< -o$@
 	@echo $(<:$(SRCDIR)/%=%)
+
+.PHONY: test
+
+test: kube_solver.exe
+	python -m unittest discover -v -s tests/py -p *test.py

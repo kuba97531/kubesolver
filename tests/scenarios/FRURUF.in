@@ -1,0 +1,4 @@
+set d 8
+set n 100
+F R U R' U' F'
+solve
