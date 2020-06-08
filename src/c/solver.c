@@ -64,10 +64,12 @@ int generate_new_level(growing_cache* cache, int level_start, int level_end, int
                 continue;
             }
             cube rotated = all_rotations[rotation](&current_unpacked.cube);
-            cache->array[new_level_end].packed = pack_ce(&rotated, rotation);
-            new_level_end++;
-            cache->used = new_level_end;
-            resize_growing_cache(cache);
+            if (cube_compare(&rotated, &current_unpacked.cube) != 0) {
+                cache->array[new_level_end].packed = pack_ce(&rotated, rotation);
+                new_level_end++;
+                cache->used = new_level_end;
+                resize_growing_cache(cache);
+            }
         }
     }
     sort_cubes(cache->array, level_end, new_level_end);
@@ -469,7 +471,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    info("KubeSolver 1.0.4 (C) Jakub Straszewski 2020");
+    info("KubeSolver 1.0.5 (C) Jakub Straszewski 2020");
 
     if (settings.max_depth < MAX_SEQUENCE_LEN) {
         info("Setting max search depth to %d moves.\n", settings.max_depth);
@@ -534,7 +536,7 @@ int main(int argc, char* argv[]) {
                     printf("ERROR: wrong argument to set max-additional-depth-of-search\n");
                     exit(1);
                 }
-                info("Will search sequences longer by at most %d moves than the shortest found sequence.\n", settings.max_depth);
+                info("Will search sequences longer by at most %d moves than the shortest found sequence.\n", settings.max_depth_after_find);
             }
             else if (!strcmp(buffer,"n") || !(strcmp(buffer,"max-number-of-sequences"))){
                 scan_result = scanf(" %d", &settings.max_number_of_output_sequences);
