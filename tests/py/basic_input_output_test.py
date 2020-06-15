@@ -1,10 +1,15 @@
 import unittest
-from solver import Solver
-
+import sys 
 from os import listdir
 from os.path import isfile, join
 
-class ShowRangeTest(unittest.TestCase):
+sys.path.insert(1, join(sys.path[0], '..\\..\\tools\\py\\util' ))
+print( )
+from solver import Solver
+
+
+
+class SolverInputOutputTest(unittest.TestCase):
     def setUp(self):
         pass
     def tearDown(self):
