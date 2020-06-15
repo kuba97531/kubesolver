@@ -1,4 +1,16 @@
+1.0.5 538118d (8.06.2020)
+=====
+- Fix a problem when some sequences were not printed. (sequences that had equivalent partial sequences to some other sequences)
+- Fix a problem with moves that don't change cube state
+- Add new option max-depth-after-first-match (da)
+- Add option to set all options as commands rather than commmand line argument. Now it's possible to set max nunber of moves or depth in config.
+Example:
+set n 10 - print first 10 sequences found
+set da 1 - only searcg sequences at most 1 move longer than the shortest sequence found
+set d 14 - only search sequences at most 14 moves long.
+
 1.0.4 8d9c540 (29.5.2020)
+=========================
 - Fixed a bug causing crashes when corner orientation was used together with wide moves.
 - add "add_edges_permutation"
 
