@@ -16,6 +16,7 @@
 
 #define MAX_SEQUENCE_LEN 22
 #define MAX_NUMBER_OF_SEQUENCES 1000000
+#define MAX_SEQUENCE_COUNT 1500
 
 // e.g. R and R'
 int is_sister_rotation(int r1, int r2) {
@@ -151,12 +152,16 @@ void set_all_rotations(void) {
 typedef struct {
     int sequence_len;
     int sequences_count;
-    int sequences[MAX_SEQUENCE_LEN * 100];
+    int sequences[MAX_SEQUENCE_LEN * MAX_SEQUENCE_COUNT];
 } list_of_sequences;
 
 void add_reverse_sequence(list_of_sequences* out_sequences, int sequence_len, int* reverse_sequence) {
     if (out_sequences -> sequences_count == 0) {
         out_sequences->sequence_len = sequence_len;
+    }
+    if (out_sequences -> sequences_count == MAX_SEQUENCE_COUNT) {
+        printf("ERROR. Max limit of %d half-sequences generated at one level exceeded..!\n", MAX_SEQUENCE_COUNT);
+        exit(1);
     }
     if (out_sequences->sequence_len != sequence_len) {
         printf("ERROR. Bug found. Internal assertion failed! Found sequences of different length on the same level.!\n");
@@ -219,7 +224,12 @@ int is_forbidden_sequence(int sequence_len, int sequence[], int direction) {
     return 0;
 }
 
-int find_sequence(int out_sequence[], int* out_sequence_len, solver_cube_packed* c, int f, int t, solver_cube_packed* cc, int ff, int tt, int max_number_of_output_sequences, int print_sequences) {
+int find_sequence(
+                  int out_sequence[], 
+                  int* out_sequence_len,
+                  solver_cube_packed* c, int f, int t,
+                  solver_cube_packed* cc, int ff, int tt,
+                  int max_number_of_output_sequences, int print_sequences) {
     int c_level_start = f;
     int cc_level_start = ff;
     int sequences_found = 0;
