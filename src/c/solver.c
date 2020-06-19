@@ -354,7 +354,7 @@ void solve_two_phase(int input_sequence[], int input_sequence_len, int levels)
     for (int i=0; i<phase_count; i++) {
         attempted_position = all_rotations[phase_solution[i]](&attempted_position);
     }
-    printf("\n");
+    printf("  ");
     set_3gen("R2L2F2B2DU");
     solve_single_phase(phase_solution, &phase_count, &attempted_position, &starting_position, levels);
     print_sequence(phase_count, phase_solution);
