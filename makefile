@@ -117,12 +117,16 @@ $(EXE_NAME): $(OBJ_FILES) $(OBJ_REBUILD_FILES) $(REFRESH_EXE)
 	@$(STRIP)
 	@echo OK!
 
-$(OBJ_FILES): $(OBJDIR)/%$(BUILD_POSTFIX).o: $(SRCDIR)/%.c
+$(OBJ_FILES): $(OBJDIR)/%$(BUILD_POSTFIX).o: $(SRCDIR)/%.c | $(OBJDIR)
 	
 	@$(CC) $(CC_OPTIONS) -MMD -c $< -o $@
 	@$(CC) -c $(CC_OPTIONS) $< -o$@
 	@echo $(<:$(SRCDIR)/%=%)
-	
+
+
+$(OBJDIR):
+	mkdir -p $@
+
 -include $(DEP)
 	
 $(OBJ_REBUILD_FILES): $(OBJDIR)/%$(BUILD_POSTFIX).o: $(SRCDIR)/%.c
