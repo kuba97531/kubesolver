@@ -12,8 +12,10 @@
 #include "solver_io.h"
 #include "solver_cube_compression.h"
 #include "solver_growing_cache.h"
+#include "version.h"
 
 #define MAX_SEQUENCE_LEN 22
+#define MAX_NUMBER_OF_SEQUENCES 1000000
 
 // e.g. R and R'
 int is_sister_rotation(int r1, int r2) {
@@ -432,7 +434,7 @@ int main(int argc, char* argv[]) {
     char buffer[100];
     solve_settings settings = {
         .max_depth = MAX_SEQUENCE_LEN,
-        .max_number_of_output_sequences = 1000000,
+        .max_number_of_output_sequences = MAX_NUMBER_OF_SEQUENCES,
         .max_depth_after_find = -1
     };
 
@@ -471,12 +473,12 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    info("KubeSolver 1.0.5 (C) Jakub Straszewski 2020");
+    info(WELCOME_STRING);
 
     if (settings.max_depth < MAX_SEQUENCE_LEN) {
         info("Setting max search depth to %d moves.\n", settings.max_depth);
     }
-    if (settings.max_number_of_output_sequences != INT_MAX) {
+    if (settings.max_number_of_output_sequences != MAX_NUMBER_OF_SEQUENCES) {
         info("Setting max number of output sequences to %d.\n", settings.max_number_of_output_sequences);
     }
     if (settings.max_depth_after_find != -1) {
