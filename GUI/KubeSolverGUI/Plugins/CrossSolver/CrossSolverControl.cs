@@ -1,9 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Mime;
+using System.Text;
 using KubeSolverGUI.Utils;
 using KubeSolverGUI.Utils.Controls;
 using KubeSolverGUI.Utils.Cube;
+using KubeSolverGUI.Utils.Exceptions;
 using KubeSolverGUI.Utils.ExecutionUtil;
+using KubeSolverGUI.Utils.Serialization;
+using KubeSolverGUI.Utils.Strings;
 
 namespace KubeSolverGUI.Plugins.CrossSolver
 {
@@ -95,6 +103,46 @@ namespace KubeSolverGUI.Plugins.CrossSolver
                     _processor.SetAdjuster(null);
                 }
             });
+        }
+
+        private PropertyDictionary GetValues()
+        {
+            PropertyDictionary dict = new PropertyDictionary();
+            GetOrSetValues(dict, GetOrSet.Get);
+            return dict;
+        }
+
+        private void SetValues(PropertyDictionary dict)
+        {
+            GetOrSetValues(dict, GetOrSet.Set);
+        }
+
+        private void GetOrSetValues(PropertyDictionary dict, GetOrSet mode)
+        {
+            dict.Do((x) =>
+            {
+                SerializationUtil.GetOrSetControlValue(x, "crossOrientation", crossOrientationControl, mode);
+                SerializationUtil.GetOrSetTextInTextBox(x, "generators", generatorsTextBox, mode);
+                SerializationUtil.GetOrSetTextInTextBox(x, "scramble", scrambleTextBox, mode);
+            });
+        }
+
+        private void saveCurrentParametersButton_Click(object sender, EventArgs e)
+        {
+            var saveLocation = treeViewWithFileHierarchy1.ShowFileDialogAndGetSaveLocation();
+            if (saveLocation != null)
+            {
+                var dict = GetValues();
+                File.WriteAllLines(saveLocation, dict.ToLines());
+                treeViewWithFileHierarchy1.RebuildTree(saveLocation);
+            }
+        }
+
+        private void TreeViewWithFileHierarchy1__FileSelected(string path)
+        {
+            var lines = File.ReadAllLines(path);
+            var dict = PropertyDictionary.FromLines(lines);
+            SetValues(dict);
         }
     }
 }

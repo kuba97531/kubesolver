@@ -20,6 +20,7 @@ namespace KubeSolverGUI.Utils
                 return;
             }
 
+            outputProcessor.AddLine("Starting solver " + solverExecutablePath);
             ProcessStartInfo startInfo = new ProcessStartInfo(solverExecutablePath, commandLineArgs)
             {
                 WorkingDirectory = Directory.GetParent(solverExecutablePath).FullName,

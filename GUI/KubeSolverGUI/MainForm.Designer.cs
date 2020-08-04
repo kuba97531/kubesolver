@@ -35,15 +35,19 @@ namespace KubeSolverGUI
             this.simpleSolverControl1 = new KubeSolverGUI.Plugins.SimpleSolverControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.crossSolverControl1 = new KubeSolverGUI.Plugins.CrossSolver.CrossSolverControl();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.trainingScrambleControl1 = new KubeSolverGUI.Plugins.TrainingScrambleGnerator.TrainingScrambleControl();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
@@ -89,6 +93,25 @@ namespace KubeSolverGUI
             this.crossSolverControl1.Size = new System.Drawing.Size(901, 578);
             this.crossSolverControl1.TabIndex = 0;
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.trainingScrambleControl1);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(907, 584);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Training Scramble Generator";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // trainingScrambleControl1
+            // 
+            this.trainingScrambleControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.trainingScrambleControl1.Location = new System.Drawing.Point(3, 3);
+            this.trainingScrambleControl1.Name = "trainingScrambleControl1";
+            this.trainingScrambleControl1.Size = new System.Drawing.Size(901, 578);
+            this.trainingScrambleControl1.TabIndex = 0;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -100,6 +123,7 @@ namespace KubeSolverGUI
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -111,6 +135,8 @@ namespace KubeSolverGUI
         private System.Windows.Forms.TabPage tabPage2;
         private Plugins.SimpleSolverControl simpleSolverControl1;
         private Plugins.CrossSolver.CrossSolverControl crossSolverControl1;
+        private System.Windows.Forms.TabPage tabPage3;
+        private Plugins.TrainingScrambleGnerator.TrainingScrambleControl trainingScrambleControl1;
     }
 }
 

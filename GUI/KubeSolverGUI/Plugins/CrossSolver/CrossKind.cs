@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using KubeSolverGUI.Utils.Controls;
+using KubeSolverGUI.Utils.Serialization;
 
 namespace KubeSolverGUI.Plugins.CrossSolver
 {
@@ -14,12 +15,11 @@ namespace KubeSolverGUI.Plugins.CrossSolver
         AllOrientations
     }
 
-    public class CrossOrientationControl : MultiRadioButtonSelectionControl<CrossOrientationEnum> {
+    public class CrossOrientationControl : MultiRadioButtonSelectionControl<CrossOrientationEnum>, ISerializableControl {
         public override string GetTitle()
         {
             return "Which orientations should be considered?";
         }
-
 
         public override List<Tuple<string, CrossOrientationEnum>> GetItems()
         {
@@ -28,6 +28,18 @@ namespace KubeSolverGUI.Plugins.CrossSolver
                 Tuple.Create("All colors (6 orientations)", CrossOrientationEnum.OneOrientationPerColor),
                 Tuple.Create("All colors from all angles (24 orientations)", CrossOrientationEnum.AllOrientations),
             };
+        }
+
+        public void GetOrSetInDictionary(PropertyDictionary.PrefixDictionary dict, string key, GetOrSet mode)
+        {
+            if (mode == GetOrSet.Get)
+            {
+                dict.Add(key, (int)GetSelectedItem());
+            }
+            else
+            {
+                SetSelectedItem((CrossOrientationEnum)dict.GetInt(key));
+            }
         }
     }
 }

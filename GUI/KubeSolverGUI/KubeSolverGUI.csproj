@@ -70,6 +70,15 @@
     <Compile Include="Plugins\SimpleSolverControl.Designer.cs">
       <DependentUpon>SimpleSolverControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Plugins\TrainingScrambleGnerator\scrambleKind.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Plugins\TrainingScrambleGnerator\TrainingScrambleControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Plugins\TrainingScrambleGnerator\TrainingScrambleControl.Designer.cs">
+      <DependentUpon>TrainingScrambleControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\ChildProcessTracker.cs" />
@@ -79,7 +88,7 @@
     <Compile Include="Utils\Controls\KubeControl.Designer.cs">
       <DependentUpon>KubeControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Utils\Controls\mgi.cs">
+    <Compile Include="Utils\Controls\MultiRadioButtonSelectionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Utils\Cube\ScrambleUtil.cs" />
@@ -92,7 +101,14 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Utils\ExecutionUtil\ProgressProvider.cs" />
+    <Compile Include="Utils\FilesAndDirectories\DirectoryUtil.cs" />
+    <Compile Include="Utils\Serialization\PropertyDictionary.cs" />
+    <Compile Include="Utils\Serialization\SerializationUtil.cs" />
     <Compile Include="Utils\SolverRunner.cs" />
+    <Compile Include="Utils\FilesAndDirectories\TreeViewWithFileHierarchy.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Utils\Strings\StringUtils.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -101,6 +117,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Plugins\SimpleSolverControl.resx">
       <DependentUpon>SimpleSolverControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Plugins\TrainingScrambleGnerator\TrainingScrambleControl.resx">
+      <DependentUpon>TrainingScrambleControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
