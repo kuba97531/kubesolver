@@ -70,7 +70,7 @@
     <Compile Include="Plugins\SimpleSolverControl.Designer.cs">
       <DependentUpon>SimpleSolverControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Plugins\TrainingScrambleGnerator\scrambleKind.cs">
+    <Compile Include="Plugins\TrainingScrambleGnerator\ScrambleKind.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Plugins\TrainingScrambleGnerator\TrainingScrambleControl.cs">

@@ -38,6 +38,10 @@ namespace KubeSolverGUI.Plugins
             this.label2 = new System.Windows.Forms.Label();
             this.runButton = new System.Windows.Forms.Button();
             this.idleWorkingControl1 = new KubeSolverGUI.Utils.ExecutionUtil.IdleWorkingControl();
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.saveCurrentParametersButton = new System.Windows.Forms.Button();
+            this.treeViewWithFileHierarchy1 = new KubeSolverGUI.Utils.FilesAndDirectories.TreeViewWithFileHierarchy();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -46,6 +50,11 @@ namespace KubeSolverGUI.Plugins
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
+            this.splitContainer3.Panel1.SuspendLayout();
+            this.splitContainer3.Panel2.SuspendLayout();
+            this.splitContainer3.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -62,8 +71,8 @@ namespace KubeSolverGUI.Plugins
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(733, 428);
-            this.splitContainer1.SplitterDistance = 243;
+            this.splitContainer1.Size = new System.Drawing.Size(622, 546);
+            this.splitContainer1.SplitterDistance = 206;
             this.splitContainer1.TabIndex = 3;
             // 
             // inputTextBox
@@ -73,7 +82,7 @@ namespace KubeSolverGUI.Plugins
             this.inputTextBox.Multiline = true;
             this.inputTextBox.Name = "inputTextBox";
             this.inputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.inputTextBox.Size = new System.Drawing.Size(243, 401);
+            this.inputTextBox.Size = new System.Drawing.Size(206, 519);
             this.inputTextBox.TabIndex = 1;
             // 
             // label1
@@ -104,8 +113,8 @@ namespace KubeSolverGUI.Plugins
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.runButton);
-            this.splitContainer2.Size = new System.Drawing.Size(486, 428);
-            this.splitContainer2.SplitterDistance = 374;
+            this.splitContainer2.Size = new System.Drawing.Size(412, 546);
+            this.splitContainer2.SplitterDistance = 492;
             this.splitContainer2.TabIndex = 3;
             // 
             // solverOutputTextBox
@@ -115,7 +124,7 @@ namespace KubeSolverGUI.Plugins
             this.solverOutputTextBox.Multiline = true;
             this.solverOutputTextBox.Name = "solverOutputTextBox";
             this.solverOutputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.solverOutputTextBox.Size = new System.Drawing.Size(486, 347);
+            this.solverOutputTextBox.Size = new System.Drawing.Size(412, 465);
             this.solverOutputTextBox.TabIndex = 2;
             // 
             // label2
@@ -142,20 +151,73 @@ namespace KubeSolverGUI.Plugins
             // idleWorkingControl1
             // 
             this.idleWorkingControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.idleWorkingControl1.Location = new System.Drawing.Point(0, 428);
+            this.idleWorkingControl1.Location = new System.Drawing.Point(0, 546);
             this.idleWorkingControl1.MaximumSize = new System.Drawing.Size(3000, 19);
             this.idleWorkingControl1.Name = "idleWorkingControl1";
-            this.idleWorkingControl1.Size = new System.Drawing.Size(733, 19);
+            this.idleWorkingControl1.Size = new System.Drawing.Size(878, 19);
             this.idleWorkingControl1.TabIndex = 4;
+            // 
+            // splitContainer3
+            // 
+            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer3.Name = "splitContainer3";
+            // 
+            // splitContainer3.Panel1
+            // 
+            this.splitContainer3.Panel1.Controls.Add(this.splitContainer1);
+            // 
+            // splitContainer3.Panel2
+            // 
+            this.splitContainer3.Panel2.Controls.Add(this.treeViewWithFileHierarchy1);
+            this.splitContainer3.Panel2.Controls.Add(this.panel1);
+            this.splitContainer3.Size = new System.Drawing.Size(878, 546);
+            this.splitContainer3.SplitterDistance = 622;
+            this.splitContainer3.TabIndex = 5;
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.saveCurrentParametersButton);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(252, 30);
+            this.panel1.TabIndex = 2;
+            // 
+            // saveCurrentParametersButton
+            // 
+            this.saveCurrentParametersButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.saveCurrentParametersButton.Location = new System.Drawing.Point(3, 3);
+            this.saveCurrentParametersButton.Name = "saveCurrentParametersButton";
+            this.saveCurrentParametersButton.Size = new System.Drawing.Size(246, 23);
+            this.saveCurrentParametersButton.TabIndex = 0;
+            this.saveCurrentParametersButton.Text = "save current parameters";
+            this.saveCurrentParametersButton.UseVisualStyleBackColor = true;
+            this.saveCurrentParametersButton.Click += new System.EventHandler(this.saveCurrentParametersButton_Click);
+            // 
+            // treeViewWithFileHierarchy1
+            // 
+            this.treeViewWithFileHierarchy1._DefaultExtension = "txt";
+            this.treeViewWithFileHierarchy1._DefaultExtensionDescription = "Text files";
+            this.treeViewWithFileHierarchy1._DefaultFileName = null;
+            this.treeViewWithFileHierarchy1._RootDirectory = "Configs\\Basic";
+            this.treeViewWithFileHierarchy1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeViewWithFileHierarchy1.Location = new System.Drawing.Point(0, 30);
+            this.treeViewWithFileHierarchy1.Name = "treeViewWithFileHierarchy1";
+            this.treeViewWithFileHierarchy1.Size = new System.Drawing.Size(252, 516);
+            this.treeViewWithFileHierarchy1.TabIndex = 3;
+            this.treeViewWithFileHierarchy1._FileSelected += new KubeSolverGUI.Utils.FilesAndDirectories.TreeViewWithFileHierarchy.FileSelectedDelegate(this.TreeViewWithFileHierarchy1__FileSelected);
             // 
             // SimpleSolverControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.splitContainer1);
+            this.Controls.Add(this.splitContainer3);
             this.Controls.Add(this.idleWorkingControl1);
             this.Name = "SimpleSolverControl";
-            this.Size = new System.Drawing.Size(733, 447);
+            this.Size = new System.Drawing.Size(878, 565);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -166,6 +228,11 @@ namespace KubeSolverGUI.Plugins
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.splitContainer3.Panel1.ResumeLayout(false);
+            this.splitContainer3.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
+            this.splitContainer3.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -180,5 +247,9 @@ namespace KubeSolverGUI.Plugins
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button runButton;
         private IdleWorkingControl idleWorkingControl1;
+        private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button saveCurrentParametersButton;
+        private Utils.FilesAndDirectories.TreeViewWithFileHierarchy treeViewWithFileHierarchy1;
     }
 }

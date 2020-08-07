@@ -4,12 +4,14 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using KubeSolverGUI.Utils;
 using KubeSolverGUI.Utils.ExecutionUtil;
+using KubeSolverGUI.Utils.Serialization;
 
 namespace KubeSolverGUI.Plugins.TrainingScrambleGnerator
 {
@@ -88,14 +90,25 @@ namespace KubeSolverGUI.Plugins.TrainingScrambleGnerator
                                 inputLines.Add(g[rand.Next(g.Count)]);
                             }
 
-                            if (option == TrainingScrambleTypeEnum.OptimalRUFB)
+                            switch (option)
                             {
+                                case TrainingScrambleTypeEnum.OptimalRUFB:
                                 inputLines.Insert(0, "set_gen RUFB");
                                 inputLines.Add("solve"); 
-                            }
-                            else
-                            {
-                                inputLines.Add("solve_two_phase");
+                                    break;
+                                case TrainingScrambleTypeEnum.OptimalRUFL:
+                                    inputLines.Insert(0, "set_gen RUFL");
+                                    inputLines.Add("solve");
+                                    break;
+                                case TrainingScrambleTypeEnum.OptimalRUFLB:
+                                    inputLines.Insert(0, "set_gen RUFLB");
+                                    inputLines.Add("solve");
+                                    break;
+                                case TrainingScrambleTypeEnum.Fast:
+                                    inputLines.Add("solve_two_phase");
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
 
                             SolverRunner.RunInSolver(progress, "--silent", inputLines.ToArray(), _processor);
@@ -109,5 +122,46 @@ namespace KubeSolverGUI.Plugins.TrainingScrambleGnerator
                 }
             });
         }
+
+        private PropertyDictionary GetValues()
+        {
+            PropertyDictionary dict = new PropertyDictionary();
+            GetOrSetValues(dict, GetOrSet.Get);
+            return dict;
+        }
+
+        private void SetValues(PropertyDictionary dict)
+        {
+            GetOrSetValues(dict, GetOrSet.Set);
+        }
+
+        private void GetOrSetValues(PropertyDictionary dict, GetOrSet mode)
+        {
+            dict.Do((x) =>
+            {
+                SerializationUtil.GetOrSetControlValue(x, "scrambleType", trainingScrambleTypeControl, mode);
+                SerializationUtil.GetOrSetTextInTextBox(x, "inputText", inputTextBox, mode);
+                SerializationUtil.GetOrSetTextInTextBox(x, "outputText", solverOutputTextBox, mode);
+            });
+        }
+
+        private void saveCurrentParametersButton_Click(object sender, EventArgs e)
+        {
+            var saveLocation = treeViewWithFileHierarchy1.ShowFileDialogAndGetSaveLocation();
+            if (saveLocation != null)
+            {
+                var dict = GetValues();
+                File.WriteAllLines(saveLocation, dict.ToLines());
+                treeViewWithFileHierarchy1.RebuildTree(saveLocation);
+            }
+        }
+
+        private void TreeViewWithFileHierarchy1__FileSelected(string path)
+        {
+            var lines = File.ReadAllLines(path);
+            var dict = PropertyDictionary.FromLines(lines);
+            SetValues(dict);
+        }
+
     }
 }

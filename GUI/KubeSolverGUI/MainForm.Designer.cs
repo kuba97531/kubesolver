@@ -119,7 +119,7 @@ namespace KubeSolverGUI
             this.ClientSize = new System.Drawing.Size(915, 610);
             this.Controls.Add(this.tabControl1);
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "KubeSolver";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);

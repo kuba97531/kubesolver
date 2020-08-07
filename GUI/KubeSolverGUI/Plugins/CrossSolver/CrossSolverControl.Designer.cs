@@ -232,6 +232,9 @@
             // 
             // saveCurrentParametersButton
             // 
+            this.saveCurrentParametersButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.saveCurrentParametersButton.Location = new System.Drawing.Point(3, 3);
             this.saveCurrentParametersButton.Name = "saveCurrentParametersButton";
             this.saveCurrentParametersButton.Size = new System.Drawing.Size(206, 23);
