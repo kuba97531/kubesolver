@@ -395,9 +395,9 @@ void solve(cube* c, cube* cc, solve_settings settings){
         items[i].level_end = 1;
     }
 
-    uint64_t start = pack_ce(c, 0);
-    uint64_t goal = pack_ce(cc, 0);
-    
+    __uint128_t start = pack_ce(c, 0);
+    __uint128_t goal = pack_ce(cc, 0);
+
     items[0].cache.array[0].packed = start;
     items[1].cache.array[0].packed = goal;
 
