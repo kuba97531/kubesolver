@@ -394,8 +394,21 @@ void solve(cube* c, cube* cc, solve_settings settings){
         items[i].level_start = 0;
         items[i].level_end = 1;
     }
-    items[0].cache.array[0].packed = pack_ce(c, 0);
-    items[1].cache.array[0].packed = pack_ce(cc, 0);
+
+    __uint128_t start = pack_ce(c, 0);
+    __uint128_t goal = pack_ce(cc, 0);
+
+    items[0].cache.array[0].packed = start;
+    items[1].cache.array[0].packed = goal;
+
+    if (start == goal) {
+      find_sequence(NULL, NULL,
+                    items[0].cache.array, 0, 0,
+                    items[1].cache.array, 0, 0,
+                    1, 1);
+      info("Already solved (depth 0).");
+      goto SOLVE_FINALLY;
+    }
 
     int sequences_found = 0;
 
